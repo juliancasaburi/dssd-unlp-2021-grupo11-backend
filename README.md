@@ -19,6 +19,12 @@ _Clone el repositorio_
 git clone git@github.com:juliancasaburi/dssd-unlp-2021-grupo11-backend.git
 ```
 
+_Posicionese sobre el directorio_
+
+```
+cd dssd-unlp-2021-grupo11-backend
+```
+
 _Clone laradock_
 ```
 git clone https://github.com/Laradock/laradock.git
