@@ -23,9 +23,9 @@ class UserSeeder extends Seeder
         ])->assignRole('apoderado');
 
         User::create([
-            'name'      =>  'Admin',
-            'email'     =>  'admin@admin.com',
-            'password'  =>  bcrypt('Admin'),
+            'name'      =>  'grupo11.admin',
+            'email'     =>  'grupo11.admin@acme.com',
+            'password'  =>  bcrypt('grupo11'),
             'email_verified_at' => Carbon::now()
         ])->assignRole('admin');
     }
