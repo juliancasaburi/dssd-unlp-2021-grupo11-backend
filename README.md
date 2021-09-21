@@ -16,7 +16,13 @@ _Sigue las siguientes instrucciones para clonar el repositorio_
 _Clone el repositorio_
 
 ```
-git clone git@github.com/juliancasaburi/dssd-unlp-2021-grupo11-backend.git
+git clone git@github.com:juliancasaburi/dssd-unlp-2021-grupo11-backend.git
+```
+
+_Posicionese sobre el directorio_
+
+```
+cd dssd-unlp-2021-grupo11-backend
 ```
 
 _Clone laradock_
@@ -33,7 +39,7 @@ cp .env.example .env
 _Configure el repositorio_
 
 ```
-cd ../
+cd ..
 sudo chmod -R 777 storage bootstrap/cache
 
 cd ./laradock
