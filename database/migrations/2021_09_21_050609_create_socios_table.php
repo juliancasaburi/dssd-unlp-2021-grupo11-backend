@@ -17,7 +17,7 @@ class CreateSociosTable extends Migration
             $table->id();
             $table->string('apellido');
             $table->string('nombre');
-            $table->integer('porcentaje');
+            $table->float('porcentaje');
             $table->timestamps();
 
             $table->foreign('id_sociedad')
