@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ProcessController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,5 +28,6 @@ Route::post('auth/register', [AuthController::class, 'register']);
 Route::group(['middleware' => ['apiJwt']], function(){
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('users', [UserController::class, 'index']);
+    Route::get('processes', [ProcessController::class, 'index']);
 });
 
