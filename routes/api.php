@@ -29,5 +29,7 @@ Route::group(['middleware' => ['apiJwt']], function(){
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('users', [UserController::class, 'index']);
     Route::get('processes', [ProcessController::class, 'index']);
+    Route::get('process/{name}', [ProcessController::class, 'processByName']);
+    Route::get('processRegistroSociedadAnonima', [ProcessController::class, 'processRegistroSociedadAnonima']);
 });
 
