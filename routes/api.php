@@ -28,8 +28,14 @@ Route::post('auth/register', [AuthController::class, 'register']);
 Route::group(['middleware' => ['apiJwt']], function(){
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('users', [UserController::class, 'index']);
+
+    /* Processes */
     Route::get('processes', [ProcessController::class, 'index']);
     Route::get('process/{name}', [ProcessController::class, 'processByName']);
     Route::get('processRegistroSociedadAnonima', [ProcessController::class, 'processRegistroSociedadAnonima']);
+    Route::post('process/{name}', [ProcessController::class, 'startProcessByName']); // To be deleted
+
+    /* Sociedad Anonima */
+    Route::post('sociedadAnonima', [SociedadAnonimaController::class, 'register']);
 });
 

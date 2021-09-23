@@ -48,9 +48,26 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout()
+    public function logout(Request $request)
     {
-        auth('api')->logout();
+        try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+            if (!$jsessionid || !$xBonitaAPIToken)
+                return response()->json("No cookies set", 400);
+
+            $apiUrl = env('BONITA_API_URL') . '/logoutservice';
+            $response = Http::post($apiUrl);
+
+            if ($response->status() == 401)
+                return response()->json("401 Unauthorized", 401);
+
+            auth('api')->logout();
+
+            return response()->json("Logged out", 200);
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -67,6 +84,7 @@ class AuthController extends Controller
     protected function respondWithTokenAndCookies($token, $cookieArray)
     {
         $cookie = cookie($cookieArray[1]['Name'], $cookieArray[1]['Value'], 1440);
+        $cookie2 = cookie($cookieArray[2]['Name'], $cookieArray[2]['Value'], 1440);
 
         return response()->json([
             'access_token' => $token,
@@ -74,7 +92,7 @@ class AuthController extends Controller
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'JSESSIONID' => $cookieArray[1]['Value'],
             'X-Bonita-API-Token' => $cookieArray[2]['Value']
-        ])->cookie($cookie);
+        ])->cookie($cookie)->cookie($cookie2);
     }
 
     /** TODO: Bonita Rest API register
@@ -107,9 +125,10 @@ class AuthController extends Controller
             $apiRegisterUrl = env('BONITA_API_URL') . '/API/identity/user';
 
             $jsessionid = $loginResponse->cookies()->toArray()[1]['Value'];
+            $xBonitaAPIToken = $loginResponse->cookies()->toArray()[2]['Value'];
 
             $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid,
+                'Cookie' => 'JSESSIONID='.$jsessionid.';'.'X-Bonita-API-Token='.$xBonitaAPIToken,
                 'Accept' => 'application/json'
             ])->post($apiRegisterUrl, [
                 'body' => [
