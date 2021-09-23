@@ -11,7 +11,7 @@ class WelcomeMailable extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject= "Bem-Vindos";
+    public $subject= "Welcome";
 
     /**
      * Create a new message instance.

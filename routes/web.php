@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Auth;
 Auth::routes(['verify' => true]);
 Route::get('/', [App\Http\Controllers\Web\HomeController::class, 'index'])->name('web.index');
 
-/*Exemplo de Mailabel */
-Route::get('/bemvindos', function(){
+/*Email example */
+Route::get('/emailTest', function(){
     $email = new WelcomeMailable;
-    Mail::to('noreply@galpha.co')->send($email);
+    Mail::to('someEmailAddress@domain')->send($email);
 });
