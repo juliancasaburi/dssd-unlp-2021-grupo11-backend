@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+// TODO: Datos de socios
 class SociedadAnonima extends Model
 {
 
@@ -32,7 +33,6 @@ class SociedadAnonima extends Model
         'fecha_creacion',
         'domicilio_legal',
         'domicilio_real',
-        'id_apoderado',
         'email_apoderado',
         'numero_expediente',
         'numero_hash',
