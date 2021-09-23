@@ -114,50 +114,69 @@ class AuthController extends Controller
 
         try {
             $apiLoginUrl = env('BONITA_API_URL') . '/loginservice';
-            $loginResponse = Http::asForm()->post($apiLoginUrl, [
+            $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
                 'username' => 'grupo11.admin',
                 'password' => 'grupo11',
                 'redirect' => 'false',
             ]);
-            if ($loginResponse->status() == 401)
+            if ($bonitaLoginResponse->status() == 401)
                 return response()->json("500 Internal Server Error", 500);
 
             $apiRegisterUrl = env('BONITA_API_URL') . '/API/identity/user';
 
-            $jsessionid = $loginResponse->cookies()->toArray()[1]['Value'];
-            $xBonitaAPIToken = $loginResponse->cookies()->toArray()[2]['Value'];
+            $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
+            $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID='.$jsessionid.';'.'X-Bonita-API-Token='.$xBonitaAPIToken,
-                'Accept' => 'application/json'
+            /* Register Bonita User */
+            $bonitaRegisterResponse = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'Accept' => 'application/json',
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+                'Content-Type' => 'application/json'
             ])->post($apiRegisterUrl, [
-                'body' => [
-                    'userName' => $request->email,
-                    'password' => $request->password,
-                    'password_confirm' => $request->password,
-                    'icon' => "",
-                    'firstname' => $request->name,
-                    'lastname' => $request->name,
-                    'title' => "Mr",
-                    'job_title' => "Apoderado",
-                    'manager_id' => "1"
-                ]
+                "userName" => $request->email,
+                "password" => $request->password,
+                "password_confirm" => $request->password,
+                "icon" => "",
+                "firstname" => $request->name,
+                "lastname" => $request->name,
+                "title" => "Mr",
+                "job_title" => "Apoderado",
+                "manager_id" => "1",
             ]);
 
-            if ($response->status() != 200)
-                return $response->status();
-            //return response()->json("500 Internal Server Error", 500);
+            if ($bonitaRegisterResponse->status() != 200)
+                return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
 
+            /* Enable Bonita User */
+            $bonitaEnableUserUrl = env('BONITA_API_URL') . '/API/identity/user/'.$bonitaRegisterResponse['id'];
+            $bonitaEnableUserResponse = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'Accept' => 'application/json',
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+                'Content-Type' => 'application/json'
+            ])->put($bonitaEnableUserUrl, [
+                "enabled" => "true",
+            ]);
+
+            if ($bonitaEnableUserResponse->status() != 200)
+                return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
+
+            $bonitaUserData = $bonitaRegisterResponse->json();
+            $bonitaUserData ['enabled'] = "true";
+
+            /* Save Eloquent model instance */
             $user = User::create(array_merge(
                 $validator->validated(),
                 ['password' => bcrypt($request->password)]
             ));
 
+            /* Return response */
             return response()->json([
                 'message' => 'User successfully registered',
-                'user' => $user
+                'api-user' => $user,
+                'bonita-user' => $bonitaUserData,
             ], 201);
-
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
