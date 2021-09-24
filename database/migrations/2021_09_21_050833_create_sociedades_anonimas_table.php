@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSolicitudesSociedadesAnonimasTable extends Migration
+class CreateSociedadesAnonimasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -24,11 +24,18 @@ class CreateSolicitudesSociedadesAnonimasTable extends Migration
             $table->string('numero_hash')->nullable();
             $table->string('url_codigo_QR')->nullable();
             $table->string('estado_evaluacion');
+            $table->bigInteger('id_apoderado')->unsigned()->nullable();
             $table->timestamps();
 
             $table->foreign('id_apoderado')
                 ->references('id')
                 ->on('socios');
+        });
+
+        Schema::table('socios', function (Blueprint $table) {
+            $table->foreign('id_sociedad')
+                ->references('id')
+                ->on('sociedades_anonimas');
         });
     }
 
