@@ -28,15 +28,6 @@ Route::post('auth/register', [AuthController::class, 'register']);
 // JWT protected routes
 Route::group(['middleware' => ['apiJwt']], function () {
     Route::get('users', [UserController::class, 'index']);
-
-    /* Processes */
-    Route::get('processes', [ProcessController::class, 'index']);
-    Route::get('process/{name}', [ProcessController::class, 'processByName']);
-    Route::get('processRegistroSociedadAnonima', [ProcessController::class, 'processRegistroSociedadAnonima']);
-    Route::post('process/{name}', [ProcessController::class, 'startProcessByName']); // To be deleted
-
-    /* Sociedad Anonima */
-    Route::post('sociedadAnonima', [SociedadAnonimaController::class, 'register']);
 });
 
 /* Bonita token protected routes */
