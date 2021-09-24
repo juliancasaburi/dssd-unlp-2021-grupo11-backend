@@ -12,7 +12,6 @@ class URLHelper
      */
     public function getBonitaEndpointURL(string $endpointName)
     {
-        return "{env('BONITA_API_URL')}{$endpointName}";
+        return env('BONITA_API_URL') . $endpointName;
     }
 }
-diff --git a/app/Helpers/BonitaProcessHelper.php b/app/Helpers/BonitaProcessHelper.php
