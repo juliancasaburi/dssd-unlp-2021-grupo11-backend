@@ -95,8 +95,7 @@ class AuthController extends Controller
         ])->cookie($cookie)->cookie($cookie2);
     }
 
-    /** TODO: Bonita Rest API register
-     * Register a User.
+    /** Register a User
      *
      * @return \Illuminate\Http\JsonResponse
      */
