@@ -35,7 +35,7 @@ class SociedadAnonimaController extends Controller
         $bonitaProcessHelper = new BonitaProcessHelper();
         $response = $bonitaProcessHelper->startProcessByName($request, "Registro");
 
-        /* TODO: Setear variables en la instancia de bonita */
+        /* TODO: Crear instancia del proceso en Bonita y setear variables */
 
         /* TODO: almacenar el archivo del estatuto, que viene en la request */
 

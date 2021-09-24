@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client as GuzzleClient;
+use App\Helpers\URLHelper;
 
 
 class BonitaProcessHelper
@@ -24,13 +25,15 @@ class BonitaProcessHelper
             return response()->json("No cookies set", 400);
 
         try {
-            $url = env('BONITA_API_URL') . '/API/bpm/process?s='.$name;
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process?s='.$name);
 
             $response = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid,
             ])->get($url);
 
             return $response->json();
+            
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
@@ -51,7 +54,8 @@ class BonitaProcessHelper
             return response()->json("No cookies set", 400);
 
         try {
-            $url = env('BONITA_API_URL') . '/API/bpm/process?s='.$name;
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process?s='.$name);
 
             $response = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid,
@@ -59,7 +63,7 @@ class BonitaProcessHelper
 
             $processId = $response[0]['id'];
 
-            $url = env('BONITA_API_URL') . '/API/bpm/process/'.$processId . '/instantiation';
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process/'.$processId . '/instantiation');
 
             $headers = [
                 'Content-Type' => 'application/json',
