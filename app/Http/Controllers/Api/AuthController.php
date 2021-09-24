@@ -31,7 +31,7 @@ class AuthController extends Controller
         try {
             $urlHelper = new URLHelper();
             $apiUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
-    
+
             $response = Http::asForm()->post($apiUrl, [
                 'username' => $username,
                 'password' => $credentials['password'],
@@ -54,11 +54,6 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            $jsessionid = $request->cookie('JSESSIONID');
-            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-            if (!$jsessionid || !$xBonitaAPIToken)
-                return response()->json("No cookies set", 400);
-
             $urlHelper = new URLHelper();
             $apiUrl = $urlHelper->getBonitaEndpointURL('/logoutservice');
 
@@ -170,7 +165,7 @@ class AuthController extends Controller
                 return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
 
             $bonitaUserData = $bonitaRegisterResponse->json();
-            $bonitaUserData ['enabled'] = "true";
+            $bonitaUserData['enabled'] = "true";
 
             /* Save Eloquent model instance */
             $user = User::create(array_merge(
