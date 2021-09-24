@@ -12,6 +12,6 @@ class URLHelper
      */
     public function getBonitaEndpointURL(string $endpointName)
     {
-        return config('services.BONITA.API_URL') . $endpointName;
+        return config('services.bonita.api_url') . $endpointName;
     }
 }
