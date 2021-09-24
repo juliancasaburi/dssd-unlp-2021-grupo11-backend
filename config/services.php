@@ -30,4 +30,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'bonita' => [
+        'api_url' => env('BONITA_API_URL'),
+    ],
+
 ];
