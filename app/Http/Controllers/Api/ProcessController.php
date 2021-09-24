@@ -17,11 +17,8 @@ class ProcessController extends Controller
      */
     public function index(Request $request)
     {
-        $jsessionid = $request->cookie('JSESSIONID');
-        if (!$jsessionid)
-            return response()->json("No cookies set", 400);
-
         try {
+            $jsessionid = $request->cookie('JSESSIONID');
             $url = env('BONITA_API_URL') . '/API/bpm/process?p=0&c=10';
 
             $response = Http::withHeaders([
