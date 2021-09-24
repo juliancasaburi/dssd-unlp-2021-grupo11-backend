@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use App\Helpers\URLHelper;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -28,7 +29,9 @@ class AuthController extends Controller
         $username = $user->name;
 
         try {
-            $apiUrl = env('BONITA_API_URL') . '/loginservice';
+            $urlHelper = new URLHelper();
+            $apiUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
+    
             $response = Http::asForm()->post($apiUrl, [
                 'username' => $username,
                 'password' => $credentials['password'],
@@ -56,7 +59,9 @@ class AuthController extends Controller
             if (!$jsessionid || !$xBonitaAPIToken)
                 return response()->json("No cookies set", 400);
 
-            $apiUrl = env('BONITA_API_URL') . '/logoutservice';
+            $urlHelper = new URLHelper();
+            $apiUrl = $urlHelper->getBonitaEndpointURL('/logoutservice');
+
             $response = Http::post($apiUrl);
 
             if ($response->status() == 401)
@@ -113,7 +118,9 @@ class AuthController extends Controller
         }
 
         try {
-            $apiLoginUrl = env('BONITA_API_URL') . '/loginservice';
+            $urlHelper = new URLHelper();
+            $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
+
             $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
                 'username' => 'grupo11.admin',
                 'password' => 'grupo11',
@@ -122,7 +129,7 @@ class AuthController extends Controller
             if ($bonitaLoginResponse->status() == 401)
                 return response()->json("500 Internal Server Error", 500);
 
-            $apiRegisterUrl = env('BONITA_API_URL') . '/API/identity/user';
+            $apiRegisterUrl = $urlHelper->getBonitaEndpointURL('/API/identity/user');
 
             $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
             $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
@@ -149,7 +156,7 @@ class AuthController extends Controller
                 return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
 
             /* Enable Bonita User */
-            $bonitaEnableUserUrl = env('BONITA_API_URL') . '/API/identity/user/'.$bonitaRegisterResponse['id'];
+            $bonitaEnableUserUrl = "{$apiRegisterUrl}{$bonitaRegisterResponse['id']}";
             $bonitaEnableUserResponse = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
                 'Accept' => 'application/json',
