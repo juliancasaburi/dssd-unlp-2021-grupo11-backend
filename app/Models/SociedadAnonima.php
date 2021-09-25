@@ -40,6 +40,7 @@ class SociedadAnonima extends Model
         'numero_hash',
         'url_codigo_QR',
         'estado_evaluacion',
+        'id_apoderado',
     ];
 
     /**
@@ -64,6 +65,6 @@ class SociedadAnonima extends Model
      */
     public function apoderado()
     {
-        return Socio::find($this->idApoderado);
+        return Socio::find($this->id_apoderado);
     }
 }

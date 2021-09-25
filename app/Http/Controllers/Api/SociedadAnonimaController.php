@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Helpers\BonitaProcessHelper;
 use App\Models\SociedadAnonima;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Services\SociedadAnonimaService;
 
 class SociedadAnonimaController extends Controller
 {
@@ -52,14 +53,15 @@ class SociedadAnonimaController extends Controller
 
         // TODO: guardar datos de socios
         if ($response->status() == 200) {
-            $sociedadAnonima = new SociedadAnonima();
-            $sociedadAnonima->nombre = $request->input('nombre');
-            $sociedadAnonima->fecha_creacion = $request->input('fecha_creacion');
-            $sociedadAnonima->domicilio_legal = $request->input('domicilio_legal');
-            $sociedadAnonima->domicilio_real = $request->input('domicilio_real');
-            $sociedadAnonima->email_apoderado = $request->input('email_apoderado');
-            $sociedadAnonima->apoderado = JWTAuth::user();
-            $sociedadAnonima->save();
+            $sociedadAnonimaService = new SociedadAnonimaService();
+            $sociedadAnonimaService->storeNewUser(
+                $request->input('nombre'),
+                $request->input('fecha_creacion'),
+                $request->input('domicilio_legal'),
+                $request->input('domicilio_real'),
+                $request->input('email_apoderado'),
+                // TODO: Guardar id del socio que es apoderado
+            );
         }
 
         return response()->json("Solicitud creada", 200);
