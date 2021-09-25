@@ -149,7 +149,6 @@ class AuthController extends Controller
                 "lastname" => $request->name,
                 "title" => "Mr",
                 "job_title" => "Apoderado",
-                "manager_id" => "1",
             ]);
 
             if ($bonitaRegisterResponse->status() != 200)
