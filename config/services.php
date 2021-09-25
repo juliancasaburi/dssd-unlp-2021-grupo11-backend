@@ -32,6 +32,8 @@ return [
 
     'bonita' => [
         'api_url' => env('BONITA_API_URL'),
+        'admin_user' => env('BONITA_ADMIN_USER'),
+        'admin_password' => env('BONITA_ADMIN_PASSWORD'),
     ],
 
 ];
