@@ -9,6 +9,8 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use App\Helpers\URLHelper;
 use App\Models\User;
+use App\Helpers\BonitaMembershipHelper;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -128,6 +130,10 @@ class AuthController extends Controller
             $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
             $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
 
+            $bonitaMembershipHelper = new BonitaMembershipHelper();
+            $apoderadoGrupId = $bonitaMembershipHelper->groupIdByName($request, "Apoderado");
+            $apoderadoRoleId = $bonitaMembershipHelper->roleIdByName($request, "apoderado");
+
             /* Register Bonita User */
             $bonitaRegisterResponse = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
@@ -149,8 +155,26 @@ class AuthController extends Controller
             if ($bonitaRegisterResponse->status() != 200)
                 return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
 
+            /* Set Bonita Membership */
+            $bonitaUserData = $bonitaRegisterResponse->json();
+
+            $bonitaSetUserMembershipUrl = $urlHelper->getBonitaEndpointURL("/API/identity/membership");
+            $bonitaSetUserMembershipResponse = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'Accept' => 'application/json',
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+                'Content-Type' => 'application/json'
+            ])->post($bonitaSetUserMembershipUrl, [
+                "user_id" => $bonitaUserData["id"],
+                "group_id" => $apoderadoGrupId,
+                "role_id" => $apoderadoRoleId,
+            ]);
+
+            if ($bonitaSetUserMembershipResponse->status() != 200)
+                return response()->json($bonitaSetUserMembershipResponse->json(), $bonitaSetUserMembershipResponse->status());
+
             /* Enable Bonita User */
-            $bonitaEnableUserUrl = "{$apiRegisterUrl}{$bonitaRegisterResponse['id']}";
+            $bonitaEnableUserUrl = "{$apiRegisterUrl}/{$bonitaRegisterResponse['id']}";
             $bonitaEnableUserResponse = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
                 'Accept' => 'application/json',
@@ -161,9 +185,8 @@ class AuthController extends Controller
             ]);
 
             if ($bonitaEnableUserResponse->status() != 200)
-                return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
+                return response()->json($bonitaEnableUserResponse->json(), $bonitaEnableUserResponse->status());
 
-            $bonitaUserData = $bonitaRegisterResponse->json();
             $bonitaUserData['enabled'] = "true";
 
             /* Save Eloquent model instance */
@@ -171,6 +194,8 @@ class AuthController extends Controller
                 $validator->validated(),
                 ['password' => bcrypt($request->password)]
             ));
+            $user->assignRole('apoderado'); // Assign spatie/laravel-permission user role
+            $user->save();
 
             /* Return response */
             return response()->json([
@@ -178,8 +203,8 @@ class AuthController extends Controller
                 'api-user' => $user,
                 'bonita-user' => $bonitaUserData,
             ], 201);
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
         }
     }
 }
