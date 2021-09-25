@@ -18,7 +18,7 @@ class CreateSociosTable extends Migration
             $table->string('apellido');
             $table->string('nombre');
             $table->float('porcentaje');
-            $table->bigInteger('id_sociedad')->unsigned()->nullable();
+            $table->unsignedBigInteger('id_sociedad')->unsigned()->nullable();
             $table->timestamps();
         });
     }

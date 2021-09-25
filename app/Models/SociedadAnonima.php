@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Wildside\Userstamps\Userstamps;
 
 // TODO: Datos de socios
 class SociedadAnonima extends Model
 {
+    use Userstamps;
 
     /**
      * The table associated with the model.
