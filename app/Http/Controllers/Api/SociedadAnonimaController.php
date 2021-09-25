@@ -12,6 +12,17 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class SociedadAnonimaController extends Controller
 {
     /**
+     * Obtener las sociedad anónimas registradas por el usuario actual.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserSociedadesAnonimas()
+    {
+        $sociedadesAnonimasUsuarioLogueado = SociedadAnonima::where('created_by', JWTAuth::user()->id);
+        return response()->json($sociedadesAnonimasUsuarioLogueado, 200);
+    }
+
+    /**
      * Registrar la sociedad anonima.
      *
      * @param  \Illuminate\Http\Request  $request
