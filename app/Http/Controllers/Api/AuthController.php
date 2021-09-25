@@ -118,8 +118,8 @@ class AuthController extends Controller
             $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
 
             $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
-                'username' => 'grupo11.admin',
-                'password' => 'grupo11',
+                'username' => config('services.bonita.admin_user'),
+                'password' => config('services.bonita.admin_password'),
                 'redirect' => 'false',
             ]);
             if ($bonitaLoginResponse->status() == 401)
