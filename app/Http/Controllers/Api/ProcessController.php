@@ -19,7 +19,7 @@ class ProcessController extends Controller
     {
         try {
             $jsessionid = $request->cookie('JSESSIONID');
-            $url = env('BONITA_API_URL') . '/API/bpm/process?p=0&c=10';
+            $url = env('BONITA_API_URL') . '/API/bpm/process?c=10';
 
             $response = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid,

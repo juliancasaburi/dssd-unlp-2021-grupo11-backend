@@ -12,7 +12,8 @@ class SociedadAnonimaService
         string $fecha_creacion,
         string $domicilio_legal,
         string $domicilio_real,
-        string $email_apoderado
+        string $email_apoderado,
+        string $bonitaCaseId
     ) {
         $sociedadAnonima = new SociedadAnonima();
         $sociedadAnonima->nombre = $nombre;
@@ -21,6 +22,7 @@ class SociedadAnonimaService
         $sociedadAnonima->domicilio_real = $domicilio_real;
         $sociedadAnonima->email_apoderado = $email_apoderado;
         $sociedadAnonima->estado_evaluacion = "Pendiente mesa de entradas";
+        $sociedadAnonima->bonita_case_id = $bonitaCaseId;
         $sociedadAnonima->save();
         return $sociedadAnonima;
     }
