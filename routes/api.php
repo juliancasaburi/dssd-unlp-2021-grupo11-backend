@@ -17,10 +17,6 @@ use App\Http\Controllers\Api\SociedadAnonimaController;
 |
 */
 
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 // Login & Register
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
@@ -30,7 +26,7 @@ Route::group(['middleware' => ['apiJwt']], function () {
     Route::get('users', [UserController::class, 'index']);
 });
 
-/* Bonita token protected routes */
+/* JWT & Bonita token protected routes */
 Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute']], function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('process', [ProcessController::class, 'index']);
@@ -42,3 +38,8 @@ Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute']], function () {
     Route::get('sociedadesAnonimas', [SociedadAnonimaController::class, 'getUserSociedadesAnonimas']);
     Route::post('sociedadAnonima', [SociedadAnonimaController::class, 'register']);
 });
+
+/* Employee, JWT & Bonita token protected routes 
+Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute', 'employeeOnlyRoute']], function () {
+    Route::get('nextEmployeeTask', [EmployeeTaskController::class, 'nextTask']);
+});*/

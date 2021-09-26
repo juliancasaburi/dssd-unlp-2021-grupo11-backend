@@ -64,5 +64,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'apiJwt' => \App\Http\Middleware\apiProtectedRoute::class,
         'bonitaProtectedRoute' => \App\Http\Middleware\bonitaProtectedRoute::class,
+        'employeeOnlyRoute' => \App\Http\Middleware\employeeOnlyRoute::class,
     ];
 }
