@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Http;
 use App\Helpers\URLHelper;
 use App\Models\User;
 use App\Helpers\BonitaMembershipHelper;
-use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -28,14 +27,13 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $credentials['email'])->first();
-        $username = $user->name;
 
         try {
             $urlHelper = new URLHelper();
             $apiUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
 
             $response = Http::asForm()->post($apiUrl, [
-                'username' => $username,
+                'username' => $credentials["email"],
                 'password' => $credentials['password'],
                 'redirect' => 'false',
             ]);
@@ -142,6 +140,7 @@ class AuthController extends Controller
                 'Content-Type' => 'application/json'
             ])->post($apiRegisterUrl, [
                 "userName" => $request->email,
+                "email" => $request->email,
                 "password" => $request->password,
                 "password_confirm" => $request->password,
                 "icon" => "",
