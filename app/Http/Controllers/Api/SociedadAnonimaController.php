@@ -28,7 +28,7 @@ class SociedadAnonimaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request)
+    public function register(SociedadAnonimaService $service, Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -64,8 +64,7 @@ class SociedadAnonimaController extends Controller
 
 
             if ($startProcessResponse->status() == 200) {
-                $sociedadAnonimaService = new SociedadAnonimaService();
-                $sociedadAnonima = $sociedadAnonimaService->storeNewSociedadAnonima(
+                $sociedadAnonima = $service->storeNewSociedadAnonima(
                     $request->input('nombre'),
                     $request->input('fecha_creacion'),
                     $request->input('domicilio_legal'),
@@ -75,7 +74,7 @@ class SociedadAnonimaController extends Controller
                 );
 
                 // Guardar socios
-                $sociedadAnonima = $sociedadAnonimaService->storeSocios(
+                $sociedadAnonima = $service->storeSocios(
                     $sociedadAnonima,
                     $request->input('socios'),
                 );
