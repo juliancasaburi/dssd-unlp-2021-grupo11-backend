@@ -58,6 +58,6 @@ class SociedadAnonima extends Model
      */
     public function apoderado()
     {
-        return $this->hasoNE(Socio::class, 'id_sociedad');
+        return $this->hasOne(Socio::class, 'id_sociedad');
     }
 }
