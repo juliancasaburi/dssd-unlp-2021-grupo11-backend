@@ -32,6 +32,7 @@ class SociedadAnonima extends Model
         'numero_hash',
         'url_codigo_QR',
         'estado_evaluacion',
+        'bonita_case_id',
         'id_apoderado',
     ];
 

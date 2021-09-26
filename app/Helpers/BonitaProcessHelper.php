@@ -36,6 +36,91 @@ class BonitaProcessHelper
     }
 
     /**
+     * Obtener tareas para el caso con id.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $bonitaCaseId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function tasksByCaseId(Request $request, $bonitaCaseId)
+    {
+        try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/task?p=0&c=10&f=caseId=' . $bonitaCaseId);
+
+            $response = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid,
+            ])->get($url);
+
+            return $response->json();
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
+     * Actualizar una tarea.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string $taskId
+     * @param  array $dataArray
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateTask(Request $request, $taskId, $dataArray)
+    {
+        try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
+
+            $response = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+            ])->put($url, [$dataArray]);
+
+            return $response->json();
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
+     * Actualizar una case variable.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $caseId
+     * @param  string  $variableName
+     * @param  string  $type
+     * @param  string  $value
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateCaseVariable(Request $request, $caseId, $variableName, $type, $value)
+    {
+        try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
+
+            $response = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+            ])->put($url, [
+                "type" => $type,
+                "value" => $value,
+            ]);
+
+            return $response->json();
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
      * Iniciar el proceso con nombre.
      *
      * @param  \Illuminate\Http\Request  $request
