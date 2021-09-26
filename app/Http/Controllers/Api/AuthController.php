@@ -193,6 +193,8 @@ class AuthController extends Controller
                 ['password' => bcrypt($request->password)]
             ));
             $user->assignRole('apoderado'); // Assign spatie/laravel-permission user role
+            $user->bonita_user_id = $bonitaUserData['id'];
+            $user->save();
 
             /* Return response */
             return response()->json([
