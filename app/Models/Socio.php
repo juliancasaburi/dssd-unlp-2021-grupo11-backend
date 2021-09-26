@@ -24,6 +24,6 @@ class Socio extends Model
      */
     public function sociedad()
     {
-        return $this->belongsTo(SociedadAnonima::class);
+        return $this->belongsTo(SociedadAnonima::class, 'id');
     }
 }
