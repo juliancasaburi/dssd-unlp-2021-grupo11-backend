@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\SociedadAnonima;
 use App\Models\Socio;
+use App\Models\User;
 
 class SociedadAnonimaService
 {
@@ -43,5 +44,9 @@ class SociedadAnonimaService
             }
         }
         $sociedadAnonima->save();
+    }
+
+    public function getUserSociedadesAnonimasWithSocios(User $user) {
+        return SociedadAnonima::with('socios')->where('created_by', $user->id)->get();
     }
 }
