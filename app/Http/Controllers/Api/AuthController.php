@@ -26,8 +26,6 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $user = User::where('email', $credentials['email'])->first();
-
         try {
             $urlHelper = new URLHelper();
             $apiUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
@@ -40,7 +38,10 @@ class AuthController extends Controller
             if ($response->status() == 401)
                 return response()->json("401 Unauthorized", 401);
 
-            return $this->respondWithTokenAndCookies($token, $response->cookies()->toArray());
+            $user = auth('api')->user();
+            $user["roles"] = $user->getRoleNames();
+
+            return $this->respondWithTokenCookiesAndUser($token, $response->cookies()->toArray(), $user);
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
@@ -78,21 +79,22 @@ class AuthController extends Controller
      *
      * @param  string $token
      * @param  array $cookieArray
+     * @param  User $user
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithTokenAndCookies($token, $cookieArray)
+    protected function respondWithTokenCookiesAndUser($token, $cookieArray, $user)
     {
         $cookie = cookie($cookieArray[1]['Name'], $cookieArray[1]['Value'], 1440);
         $cookie2 = cookie($cookieArray[2]['Name'], $cookieArray[2]['Value'], 1440);
 
-        return response()->json([
+        return response()->json(["auth" => [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'JSESSIONID' => $cookieArray[1]['Value'],
             'X-Bonita-API-Token' => $cookieArray[2]['Value']
-        ])->cookie($cookie)->cookie($cookie2);
+        ], "user" => $user])->cookie($cookie)->cookie($cookie2);
     }
 
     /** Register a User
