@@ -42,7 +42,7 @@ class SociedadAnonimaController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json($validator->errors()->toJson(), 400);
+                return response()->json($validator->errors(), 400);
             }
 
             /* TODO: almacenar el archivo del estatuto, que viene en la request */
