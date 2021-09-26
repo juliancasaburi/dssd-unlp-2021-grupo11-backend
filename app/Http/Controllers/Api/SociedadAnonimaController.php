@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Helpers\BonitaProcessHelper;
-use App\Models\SociedadAnonima;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Services\SociedadAnonimaService;
 
@@ -17,9 +16,9 @@ class SociedadAnonimaController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getUserSociedadesAnonimas()
+    public function getUserSociedadesAnonimas(SociedadAnonimaService $service)
     {
-        $sociedadesAnonimasUsuarioLogueado = SociedadAnonima::where('created_by', JWTAuth::user()->id);
+        $sociedadesAnonimasUsuarioLogueado = $service->getUserSociedadesAnonimasWithSocios(auth()->user());
         return response()->json($sociedadesAnonimasUsuarioLogueado, 200);
     }
 
