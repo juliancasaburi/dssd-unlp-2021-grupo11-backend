@@ -37,31 +37,36 @@ class SociedadAnonimaController extends Controller
             'domicilio_legal' => 'required|string|between:2,100',
             'domicilio_real' => 'required|string|between:2,100',
             'email_apoderado' => 'required|string|email',
-            // TODO: validar datos de socios
+            'socios' => 'required|array',
+            // TODO: validar datos de cada socio
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
 
+        /* TODO: almacenar el archivo del estatuto, que viene en la request */
+
+        /* TODO: setear variables de la instancia (case) de Bonita */
         $bonitaProcessHelper = new BonitaProcessHelper();
         $response = $bonitaProcessHelper->startProcessByName($request, "Registro");
 
-        /* TODO: Crear instancia del proceso en Bonita y setear variables */
-
-        /* TODO: almacenar el archivo del estatuto, que viene en la request */
-
-        // TODO: guardar datos de socios
         if ($response->status() == 200) {
             $sociedadAnonimaService = new SociedadAnonimaService();
-            $sociedadAnonimaService->storeNewUser(
+            $sociedadAnonima = $sociedadAnonimaService->storeNewSociedadAnonima(
                 $request->input('nombre'),
                 $request->input('fecha_creacion'),
                 $request->input('domicilio_legal'),
                 $request->input('domicilio_real'),
                 $request->input('email_apoderado'),
-                // TODO: Guardar id del socio que es apoderado
             );
+
+            // Guardar socios
+            $sociedadAnonima = $sociedadAnonimaService->storeSocios(
+                $sociedadAnonima,
+                $request->input('socios'),
+            );
+
         }
 
         return response()->json("Solicitud creada", 200);
