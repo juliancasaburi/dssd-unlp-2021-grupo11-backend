@@ -54,6 +54,7 @@ class SociedadAnonimaController extends Controller
             $startProcessResponse = $bonitaProcessHelper->startProcessByName($request, "Registro");
             $bonitaCaseId = $startProcessResponse->original->caseId;
             $bonitaProcessHelper->updateCaseVariable($request, $bonitaCaseId, "nombre_sociedad", "java.lang.String", $request->input('nombre'));
+            $bonitaProcessHelper->updateCaseVariable($request, $bonitaCaseId, "email_apoderado", "java.lang.String", $request->input('email_apoderado'));
             $userTasksResponse = $bonitaProcessHelper->tasksByCaseId($request, $bonitaCaseId);
             $updateTaskDataArray = [
                 "assigned_id" => JWTAuth::user()->bonita_user_id,
