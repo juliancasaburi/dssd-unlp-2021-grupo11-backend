@@ -25,6 +25,12 @@ _Posicionese sobre el directorio_
 cd dssd-unlp-2021-grupo11-backend
 ```
 
+_Configure el repositorio_
+
+```
+sudo chmod -R 777 storage bootstrap/cache
+```
+
 _Clone laradock_
 ```
 git clone https://github.com/Laradock/laradock.git
@@ -36,14 +42,14 @@ cd ./laradock
 cp .env.example .env
 ```
 
-_Configure el repositorio_
-
+_Inicie el servidor_
 ```
-cd ..
-sudo chmod -R 777 storage bootstrap/cache
-
 cd ./laradock
-sudo docker-compose up -d nginx postgres pgadmin redis workspace 
+sudo docker-compose up -d nginx postgres workspace 
+```
+
+En el primer inicio, deberá instalar las dependencias y realizar algunas actividades de configuración
+```
 sudo docker-compose exec workspace /bin/bash
 composer install
 php artisan key:generate
@@ -56,3 +62,17 @@ _Si todo está correcto puede acceder al proyecto en la dirección http://localh
 
 apoderado.test@acme.com  
 grupo11
+
+## Iniciar el servidor 🖥️ 🆙
+Puede indicar los contenedores a iniciar. Como mínimo deberá iniciar nginx, postgres y workspace
+```
+cd ./laradock
+sudo docker-compose up -d nginx postgres workspace
+```
+
+Por ejemplo, puede agregar redis y pgadmin
+
+```
+cd ./laradock
+sudo docker-compose up -d nginx postgres redis pgadmin workspace
+```
