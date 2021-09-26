@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProcessController;
 use App\Http\Controllers\Api\SociedadAnonimaController;
+use App\Http\Controllers\Api\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,7 +40,7 @@ Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute']], function () {
     Route::post('sociedadAnonima', [SociedadAnonimaController::class, 'register']);
 });
 
-/* Employee, JWT & Bonita token protected routes 
+/* Employee, JWT & Bonita token protected routes */
 Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute', 'employeeOnlyRoute']], function () {
-    Route::get('nextEmployeeTask', [EmployeeTaskController::class, 'nextTask']);
-});*/
+    Route::get('nextEmployeeTask', [TaskController::class, 'nextTask']);
+});

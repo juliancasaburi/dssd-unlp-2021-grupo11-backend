@@ -50,7 +50,7 @@ class SociedadAnonima extends Model
      */
     public function socios()
     {
-        return $this->hasMany(Socio::class);
+        return $this->hasMany(Socio::class, 'id_sociedad');
     }
 
     /**
@@ -58,6 +58,6 @@ class SociedadAnonima extends Model
      */
     public function apoderado()
     {
-        return Socio::find($this->id_apoderado);
+        return $this->hasoNE(Socio::class, 'id_sociedad');
     }
 }
