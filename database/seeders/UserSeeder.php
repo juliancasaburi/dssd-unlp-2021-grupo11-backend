@@ -5,6 +5,9 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Helpers\URLHelper;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -15,33 +18,44 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'name'      =>  'apoderado.test',
-            'email'     =>  'apoderado.test@acme.com',
-            'password'  =>  bcrypt('grupo11'),
-            'email_verified_at' => Carbon::now()
-        ])->assignRole('apoderado');
-
-        User::create([
-            'name'      =>  'grupo11.admin',
-            'email'     =>  'grupo11.admin@acme.com',
-            'password'  =>  bcrypt('grupo11'),
-            'email_verified_at' => Carbon::now()
-        ])->assignRole('admin');
-
         // Bonita users
-        User::create([
-            'name'      =>  'empleadomesa.test',
-            'email'     =>  'empleadomesa.test@acme.com',
-            'password'  =>  bcrypt('grupo11'),
-            'email_verified_at' => Carbon::now()
-        ])->assignRole('empleado-mesa-entradas');
+        $urlHelper = new URLHelper();
+        $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
 
-        User::create([
-            'name'      =>  'escribano.test',
-            'email'     =>  'escribano.test@acme.com',
-            'password'  =>  bcrypt('grupo11'),
-            'email_verified_at' => Carbon::now()
-        ])->assignRole('escribano-area-legales');
+        $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
+            'username' => config('services.bonita.admin_user'),
+            'password' => config('services.bonita.admin_password'),
+            'redirect' => 'false',
+        ]);
+
+        $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
+        $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
+
+        $apiIdentityUsersUrl = $urlHelper->getBonitaEndpointURL('/API/identity/user?p=0');
+
+        $users = Http::withHeaders([
+            'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+            'X-Bonita-API-Token' => $xBonitaAPIToken,
+        ])->get($apiIdentityUsersUrl);
+
+        foreach (json_decode($users, true) as $user) {
+            $role = '';
+            if (Str::contains($user["userName"], 'admin')) {
+                $role = 'admin';
+            } elseif (Str::contains($user["userName"], 'apoderado')) {
+                $role = 'apoderado';
+            } elseif (Str::contains($user["userName"], 'empleado')) {
+                $role = 'empleado-mesa-de-entradas';
+            } elseif (Str::contains($user["userName"], 'escribano')) {
+                $role = 'escribano-area-legales';
+            }
+            User::create([
+                'name'      =>  $user["firstname"],
+                'email'     =>  $user["userName"],
+                'password'  =>  bcrypt('grupo11'),
+                'bonita_user_id'  =>  $user["id"],
+                'email_verified_at' => Carbon::now()
+            ])->assignRole($role);
+        }
     }
 }
