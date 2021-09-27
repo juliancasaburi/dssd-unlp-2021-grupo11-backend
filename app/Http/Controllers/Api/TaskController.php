@@ -11,21 +11,65 @@ use App\Models\SociedadAnonima;
 class TaskController extends Controller
 {
     /**
-     * Próxima tarea a realizar por el usuario autenticado.
+     * Primera tarea disponible para el usuario autenticado.
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function nextTask(Request $request)
     {
         try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
             $bonitaTaskHelper = new BonitaTaskHelper();
-            $response = $bonitaTaskHelper->nextTask($request, auth()->user()->getRoleNames());
+            $response = $bonitaTaskHelper->nextTask($jsessionid, $xBonitaAPIToken, auth()->user()->getRoleNames());
 
             $responseData = $response[0];
             $sociedad = SociedadAnonima::with(['apoderado', 'socios'])->where('bonita_case_id', $responseData["caseId"])->first();
             $responseData["datosSociedad"] = $sociedad;
 
             return response()->json($responseData, 200);
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
+     * Tareas disponibles para el usuario autenticado.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function availableTasks(Request $request)
+    {
+        try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $response = $bonitaTaskHelper->availableTasks($jsessionid, $xBonitaAPIToken, auth()->user()->getRoleNames());
+
+            return response()->json($response, 200);
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
+     * Asignar tarea con id al usuario autenticado.
+     *
+     * @param int $taskId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function assignTask(Request $request, $taskId)
+    {
+        try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $response = $bonitaTaskHelper->assignTask($jsessionid, $xBonitaAPIToken, $taskId, auth()->user()->bonita_user_id);
+
+            return response()->json("Tarea asignada", 200);
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }

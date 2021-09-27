@@ -40,8 +40,10 @@ class ProcessController extends Controller
      */
     public function processByName(Request $request, $name)
     {
+        $jsessionid = $request->cookie('JSESSIONID');
+
         $bonitaProcessHelper = new BonitaProcessHelper();
-        return $bonitaProcessHelper->processByName($request, $name);
+        return $bonitaProcessHelper->processByName($jsessionid, $name);
     }
 
     /**
@@ -51,8 +53,10 @@ class ProcessController extends Controller
      */
     public function processRegistroSociedadAnonima(Request $request)
     {
+        $jsessionid = $request->cookie('JSESSIONID');
+
         $bonitaProcessHelper = new BonitaProcessHelper();
-        return $bonitaProcessHelper->processByName($request, "Registro");
+        return $bonitaProcessHelper->processByName($jsessionid, "Registro");
     }
 
     /**
@@ -64,7 +68,10 @@ class ProcessController extends Controller
      */
     public function startProcessByName(Request $request, $name)
     {
+        $jsessionid = $request->cookie('JSESSIONID');
+        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
         $bonitaProcessHelper = new BonitaProcessHelper();
-        return $bonitaProcessHelper->startProcessByName($request, $name);
+        return $bonitaProcessHelper->startProcessByName($jsessionid, $xBonitaAPIToken, $name);
     }
 }
