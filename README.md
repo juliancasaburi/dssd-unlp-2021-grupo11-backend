@@ -63,7 +63,8 @@ _Para cargar los usuarios existentes en la aplicación de Bonita, siga los sigui
 >Es necesario que el servidor de Bonita se encuentre en ejecución
 ```
 cd ./laradock
-sudo docker-compose up -d nginx postgres workspace 
+sudo docker-compose up -d nginx postgres workspace
+sudo docker-compose exec workspace /bin/bash
 php artisan db:seed
 ```
 
