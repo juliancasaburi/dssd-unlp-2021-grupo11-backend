@@ -87,4 +87,26 @@ class BonitaTaskHelper
             return response()->json("500 Internal Server Error", 500);
         }
     }
+
+    /**
+     * Liberar tarea con id por parte del usuario autenticado.
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
+     * @param  int $taskId
+     * @param  int $bonitaUserId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function unassignTask($jsessionid, $xBonitaAPIToken, $taskId, $bonitaUserId)
+    {
+        try {
+            $updateTaskDataArray = [
+                "assigned_id" => $bonitaUserId,
+            ];
+
+            $bonitaProcessHelper = new BonitaProcessHelper();
+            $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
 }
