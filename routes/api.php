@@ -48,5 +48,6 @@ Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute', 'employeeOnlyRo
     Route::get('nextEmployeeTask', [TaskController::class, 'nextTask']);
     Route::get('availableEmployeeTasks', [TaskController::class, 'availableTasks']);
     Route::post('assignTask/{id}', [TaskController::class, 'assignTask']);
+    Route::post('unassignTask/{id}', [TaskController::class, 'unassignTask']);
     Route::get('sociedadAnonimaByCaseId/{id}', [SociedadAnonimaController::class, 'getSociedadAnonimaByCaseId']);
 });

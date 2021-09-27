@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client as GuzzleClient;
@@ -37,18 +36,18 @@ class BonitaProcessHelper
     /**
      * Obtener tareas para el caso con id.
      *
-     * @param  string $jsessionid
      * @param  string  $bonitaCaseId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function tasksByCaseId($jsessionid, $bonitaCaseId)
+    public function tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId)
     {
         try {
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/task?p=0&c=10&f=caseId=' . $bonitaCaseId);
 
             $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid,
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
             ])->get($url);
 
             return $response->json();
