@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'apiJwt' => \App\Http\Middleware\apiProtectedRoute::class,
         'bonitaProtectedRoute' => \App\Http\Middleware\bonitaProtectedRoute::class,
         'employeeOnlyRoute' => \App\Http\Middleware\employeeOnlyRoute::class,
+        'apoderadoOnlyRoute' => \App\Http\Middleware\apoderadoOnlyRoute::class,
     ];
 }
