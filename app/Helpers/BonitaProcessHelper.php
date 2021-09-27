@@ -14,14 +14,13 @@ class BonitaProcessHelper
     /**
      * Obtener datos del proceso con nombre.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  string $jsessionid
      * @param  string  $name
      * @return \Illuminate\Http\JsonResponse
      */
-    public function processByName(Request $request, $name)
+    public function processByName($jsessionid, $name)
     {
         try {
-            $jsessionid = $request->cookie('JSESSIONID');
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process?s=' . $name);
 
@@ -38,14 +37,13 @@ class BonitaProcessHelper
     /**
      * Obtener tareas para el caso con id.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  string $jsessionid
      * @param  string  $bonitaCaseId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function tasksByCaseId(Request $request, $bonitaCaseId)
+    public function tasksByCaseId($jsessionid, $bonitaCaseId)
     {
         try {
-            $jsessionid = $request->cookie('JSESSIONID');
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/task?p=0&c=10&f=caseId=' . $bonitaCaseId);
 
@@ -62,17 +60,15 @@ class BonitaProcessHelper
     /**
      * Actualizar una tarea.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
      * @param  string $taskId
      * @param  array $dataArray
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateTask(Request $request, $taskId, $dataArray)
+    public function updateTask($jsessionid, $xBonitaAPIToken, $taskId, $dataArray)
     {
         try {
-            $jsessionid = $request->cookie('JSESSIONID');
-            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
 
@@ -90,19 +86,17 @@ class BonitaProcessHelper
     /**
      * Actualizar una case variable.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
      * @param  int  $caseId
      * @param  string  $variableName
      * @param  string  $type
      * @param  string  $value
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateCaseVariable(Request $request, $caseId, $variableName, $type, $value)
+    public function updateCaseVariable($jsessionid, $xBonitaAPIToken, $caseId, $variableName, $type, $value)
     {
         try {
-            $jsessionid = $request->cookie('JSESSIONID');
-            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
 
@@ -121,18 +115,16 @@ class BonitaProcessHelper
     }
 
     /**
-     * Iniciar el proceso con nombre.
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $name
      * @return \Illuminate\Http\JsonResponse
      */
-    public function startProcessByName(Request $request, $name)
+    public function startProcessByName($jsessionid, $xBonitaAPIToken, $name)
     {
         try {
-            $jsessionid = $request->cookie('JSESSIONID');
-            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process?s=' . $name);
 
