@@ -49,13 +49,15 @@ class UserSeeder extends Seeder
             } elseif (Str::contains($user["userName"], 'escribano')) {
                 $role = 'escribano-area-legales';
             }
-            User::create([
-                'name'      =>  $user["firstname"],
-                'email'     =>  $user["userName"],
-                'password'  =>  bcrypt('grupo11'),
-                'bonita_user_id'  =>  $user["id"],
-                'email_verified_at' => Carbon::now()
-            ])->assignRole($role);
+            if ($role != ''){
+                User::create([
+                    'name'      =>  $user["firstname"],
+                    'email'     =>  $user["userName"],
+                    'password'  =>  bcrypt('grupo11'),
+                    'bonita_user_id'  =>  $user["id"],
+                    'email_verified_at' => Carbon::now()
+                ])->assignRole($role);
+            }
         }
     }
 }
