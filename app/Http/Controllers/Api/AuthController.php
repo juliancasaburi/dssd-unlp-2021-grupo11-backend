@@ -158,15 +158,16 @@ class AuthController extends Controller
             /* Save Eloquent model instance */
             $user = User::create(array_merge(
                 $validator->validated(),
-                ['password' => bcrypt($request->password)]
+                [
+                    'password' => bcrypt($request->password),
+                    'bonita_user_id' => $bonitaUserData['id'],
+                ]
             ));
             $user->assignRole('apoderado'); // Assign spatie/laravel-permission user role
-            $user->bonita_user_id = $bonitaUserData['id'];
-            $user->save();
 
             /* Return response */
             return response()->json([
-                'message' => 'User successfully registered',
+                'message' => 'Usuario registrado exitosamente.',
                 'api-user' => $user,
                 'bonita-user' => $bonitaUserData,
             ], 201);
