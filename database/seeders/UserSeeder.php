@@ -28,5 +28,20 @@ class UserSeeder extends Seeder
             'password'  =>  bcrypt('grupo11'),
             'email_verified_at' => Carbon::now()
         ])->assignRole('admin');
+
+        // Bonita users
+        User::create([
+            'name'      =>  'empleadomesa.test',
+            'email'     =>  'empleadomesa.test@acme.com',
+            'password'  =>  bcrypt('grupo11'),
+            'email_verified_at' => Carbon::now()
+        ])->assignRole('empleado-mesa-entradas');
+
+        User::create([
+            'name'      =>  'escribano.test',
+            'email'     =>  'escribano.test@acme.com',
+            'password'  =>  bcrypt('grupo11'),
+            'email_verified_at' => Carbon::now()
+        ])->assignRole('escribano-area-legales');
     }
 }
