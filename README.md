@@ -48,20 +48,24 @@ cd ./laradock
 sudo docker-compose up -d nginx postgres workspace 
 ```
 
-En el primer inicio, deberá instalar las dependencias y realizar algunas actividades de configuración
+_En el primer inicio, deberá instalar las dependencias y realizar algunas actividades de configuración_
 ```
 sudo docker-compose exec workspace /bin/bash
 composer install
 php artisan key:generate
 php artisan jwt:secret
 php artisan migrate
-php artisan db:seed
 ```
 
-_Si todo está correcto puede acceder al proyecto en la dirección http://localhost:80_ con los datos:
+## Database Seeding
 
-apoderado.test@acme.com  
-grupo11
+_Para cargar los usuarios existentes en la aplicación de Bonita, siga los siguientes pasos_
+>Es necesario que el servidor de Bonita se encuentre en ejecución
+```
+cd ./laradock
+sudo docker-compose up -d nginx postgres workspace 
+php artisan db:seed
+```
 
 ## Iniciar el servidor 🖥️ 🆙
 Puede indicar los contenedores a iniciar. Como mínimo deberá iniciar nginx, postgres y workspace
@@ -76,3 +80,6 @@ Por ejemplo, puede agregar redis y pgadmin
 cd ./laradock
 sudo docker-compose up -d nginx postgres redis pgadmin workspace
 ```
+
+## Accediendo a la api
+La api puede accederse en http://localhost:80
