@@ -34,7 +34,10 @@ Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute']], function () {
     Route::get('process/{name}', [ProcessController::class, 'processByName']);
     Route::get('processRegistroSociedadAnonima', [ProcessController::class, 'processRegistroSociedadAnonima']);
     Route::post('process/{name}', [ProcessController::class, 'startProcessByName']); // To be deleted
+});
 
+/* Apoderado, JWT & Bonita token protected routes */
+Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute', 'apoderadoOnlyRoute']], function () {
     /* Sociedad Anonima */
     Route::get('sociedadesAnonimas', [SociedadAnonimaController::class, 'getUserSociedadesAnonimas']);
     Route::post('sociedadAnonima', [SociedadAnonimaController::class, 'register']);
