@@ -98,7 +98,8 @@ class SociedadAnonimaController extends Controller
                 'domicilio_legal' => 'required|string|between:2,100',
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
-                'socios' => 'required|array',
+                'socios' => 'required|json',
+                'archivo_estatuto' => 'mimes:pdf,doc,docx'
                 // TODO: validar datos de cada socio
             ]);
 
@@ -129,6 +130,7 @@ class SociedadAnonimaController extends Controller
 
             if ($startProcessResponse->status() == 200) {
                 $sociedadAnonima = $service->storeNewSociedadAnonima(
+                    $request->file('archivo_estatuto'),
                     $request->input('nombre'),
                     $request->input('fecha_creacion'),
                     $request->input('domicilio_legal'),
@@ -137,10 +139,10 @@ class SociedadAnonimaController extends Controller
                     $bonitaCaseId,
                 );
 
-                // Guardar socios
+                /* Guardar socios */
                 $sociedadAnonima = $service->storeSocios(
                     $sociedadAnonima,
-                    $request->input('socios'),
+                    json_decode($request->input('socios'), true),
                 );
 
                 return response()->json("Solicitud creada", 200);

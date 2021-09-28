@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Models\SociedadAnonima;
 use App\Models\Socio;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class SociedadAnonimaService
 {
     public function storeNewSociedadAnonima(
+        $archivoEstatuto,
         string $nombre,
         string $fecha_creacion,
         string $domicilio_legal,
@@ -24,7 +26,13 @@ class SociedadAnonimaService
         $sociedadAnonima->email_apoderado = $email_apoderado;
         $sociedadAnonima->estado_evaluacion = "Pendiente mesa de entradas";
         $sociedadAnonima->bonita_case_id = $bonitaCaseId;
+
+        Storage::disk('google')->createDir($nombre);
+        $metaData = Storage::disk('google')->getMetaData($nombre);
+        $archivoEstatuto->storeAs($metaData["path"], "estatuto_{$nombre}.{$archivoEstatuto->extension()}", 'google');
+
         $sociedadAnonima->save();
+
         return $sociedadAnonima;
     }
 
@@ -46,15 +54,18 @@ class SociedadAnonimaService
         $sociedadAnonima->save();
     }
 
-    public function getUserSociedadesAnonimasWithSocios(User $user) {
+    public function getUserSociedadesAnonimasWithSocios(User $user)
+    {
         return SociedadAnonima::with('socios')->where('created_by', $user->id)->get();
     }
 
-    public function getSociedadAnonimaWithSociosByCaseId(int $bonitaCaseId) {
+    public function getSociedadAnonimaWithSociosByCaseId(int $bonitaCaseId)
+    {
         return SociedadAnonima::with('socios')->where('bonita_case_id', $bonitaCaseId)->first();
     }
 
-    public function getSociedadAnonimaByCaseId(int $bonitaCaseId) {
+    public function getSociedadAnonimaByCaseId(int $bonitaCaseId)
+    {
         return SociedadAnonima::where('bonita_case_id', $bonitaCaseId)->first();
     }
 }
