@@ -15,6 +15,7 @@ class TaskController extends Controller
     /**
      * Primera tarea disponible para el usuario autenticado.
      *
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function nextTask(Request $request)
@@ -39,6 +40,7 @@ class TaskController extends Controller
     /**
      * Tareas disponibles para el usuario autenticado.
      *
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function availableTasks(Request $request)
@@ -59,6 +61,7 @@ class TaskController extends Controller
     /**
      * Asignar tarea con id al usuario autenticado.
      *
+     * @param  \Illuminate\Http\Request $request
      * @param int $taskId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -85,6 +88,7 @@ class TaskController extends Controller
     /**
      * Liberar tarea con id por parte del usuario autenticado.
      *
+     * @param  \Illuminate\Http\Request $request
      * @param int $taskId
      * @return \Illuminate\Http\JsonResponse
      */

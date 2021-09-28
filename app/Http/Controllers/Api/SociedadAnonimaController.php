@@ -37,7 +37,7 @@ class SociedadAnonimaController extends Controller
     /**
      * Registrar la sociedad anonima.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(SociedadAnonimaService $service, Request $request)

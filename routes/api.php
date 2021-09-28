@@ -18,18 +18,20 @@ use App\Http\Controllers\Api\TaskController;
 |
 */
 
-// Login & Register
+/* Auth */
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
 
-// JWT protected routes
+/* JWT protected routes */
 Route::group(['middleware' => ['apiJwt']], function () {
     Route::get('users', [UserController::class, 'index']);
 });
 
 /* JWT & Bonita token protected routes */
 Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute']], function () {
+    /* Auth */
     Route::post('auth/logout', [AuthController::class, 'logout']);
+    /* Process */
     Route::get('process', [ProcessController::class, 'index']);
     Route::get('process/{name}', [ProcessController::class, 'processByName']);
     Route::get('processRegistroSociedadAnonima', [ProcessController::class, 'processRegistroSociedadAnonima']);

@@ -16,6 +16,7 @@ class AuthController extends Controller
     /**
      * Get a JWT and cookie via given credentials.
      *
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
@@ -50,6 +51,7 @@ class AuthController extends Controller
     /**
      * Log the user out (Invalidate the token).
      *
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
@@ -99,6 +101,7 @@ class AuthController extends Controller
 
     /** Register a User
      *
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
