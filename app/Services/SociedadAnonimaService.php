@@ -50,7 +50,11 @@ class SociedadAnonimaService
         return SociedadAnonima::with('socios')->where('created_by', $user->id)->get();
     }
 
-    public function getSociedadAnonimaByCaseId(int $bonitaCaseId) {
+    public function getSociedadAnonimaWithSociosByCaseId(int $bonitaCaseId) {
         return SociedadAnonima::with('socios')->where('bonita_case_id', $bonitaCaseId)->first();
+    }
+
+    public function getSociedadAnonimaByCaseId(int $bonitaCaseId) {
+        return SociedadAnonima::where('bonita_case_id', $bonitaCaseId)->first();
     }
 }

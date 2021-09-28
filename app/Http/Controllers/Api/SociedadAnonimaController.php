@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Helpers\BonitaProcessHelper;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Services\SociedadAnonimaService;
+use App\Helpers\BonitaTaskHelper;
+use App\Models\SociedadAnonima;
 
 class SociedadAnonimaController extends Controller
 {
@@ -30,8 +32,55 @@ class SociedadAnonimaController extends Controller
      */
     public function getSociedadAnonimaByCaseId(SociedadAnonimaService $service, $bonitaCaseId)
     {
-        $sociedadAnonima = $service->getSociedadAnonimaByCaseId($bonitaCaseId);
+        $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($bonitaCaseId);
         return response()->json($sociedadAnonima, 200);
+    }
+
+    /**
+     * Aprobar/Rechazar.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param int $taskId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateSociedadAnonimaStatus(Request $request, SociedadAnonimaService $service, $taskId)
+    {
+        $jsessionid = $request->cookie('JSESSIONID');
+        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
+        $bonitaTaskHelper = new BonitaTaskHelper();
+        $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
+
+        if ($response["state"] != "ready" or $response["assigned_id"] != auth()->user()->bonita_user_id)
+            return response()->json("No puedes aprobar/rechazar esta tarea.", 403);
+
+        // Completar la tarea en Bonita
+        $updateTaskDataArray = [
+            "state" => "completed",
+        ];
+        $bonitaProcessHelper = new BonitaProcessHelper();
+        $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+
+        // Actualizar el case de Bonita
+        $bonitaCaseId = $response["caseId"];
+        $sociedadAnonima = $service->getSociedadAnonimaByCaseId($bonitaCaseId);
+
+        $aprobado = $request->input('aprobado');
+        $rol = auth()->user()->getRoleNames()->first();
+        $nuevoEstadoEvaluacion = '';
+        if ($aprobado) {
+            $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
+        } else {
+            $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
+        }
+
+        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+
+        // Actualizar la SociedadAnonima
+        $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+        $sociedadAnonima->save();
+
+        return response()->json("Tarea aprobada/rechazada", 200);
     }
 
     /**

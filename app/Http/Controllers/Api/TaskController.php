@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Client\ConnectionException;
 use App\Helpers\BonitaTaskHelper;
 use App\Models\SociedadAnonima;
-use App\Helpers\URLHelper;
-use Illuminate\Support\Facades\Http;
 
 class TaskController extends Controller
 {
@@ -59,6 +57,27 @@ class TaskController extends Controller
     }
 
     /**
+     * Tareas tomadas por el usuario autenticado.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function userTasks(Request $request)
+    {
+        try {
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $response = $bonitaTaskHelper->userTasks($jsessionid, $xBonitaAPIToken, auth()->user()->bonita_user_id);
+
+            return response()->json($response, 200);
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
      * Asignar tarea con id al usuario autenticado.
      *
      * @param  \Illuminate\Http\Request $request
@@ -72,7 +91,7 @@ class TaskController extends Controller
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
             $bonitaTaskHelper = new BonitaTaskHelper();
-            $response = $bonitaTaskHelper->taskData($jsessionid, $xBonitaAPIToken, $taskId);
+            $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
             if ($response["assigned_id"] != 0)
                 return response()->json("La tarea ya se encuentra asignada. Primero debe ser liberada.", 403); 
@@ -99,10 +118,10 @@ class TaskController extends Controller
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
             $bonitaTaskHelper = new BonitaTaskHelper();
-            $response = $bonitaTaskHelper->taskData($jsessionid, $xBonitaAPIToken, $taskId);
+            $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
             if (!$response["assigned_id"] == auth()->user()->bonita_user_id)
-                return response()->json("La tarea se encuentra asignada a otro usuario. No puedes liberarla.", 403); 
+                return response()->json("No estás asginado a la tarea. No puedes liberarla.", 403); 
 
             $bonitaTaskHelper = new BonitaTaskHelper();
             $response = $bonitaTaskHelper->unassignTask($jsessionid, $xBonitaAPIToken, $taskId, "");

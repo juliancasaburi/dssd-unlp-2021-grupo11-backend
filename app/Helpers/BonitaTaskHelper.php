@@ -17,11 +17,35 @@ class BonitaTaskHelper
      * @param  int $taskId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function taskData($jsessionid, $xBonitaAPIToken, $taskId)
+    public function taskDataById($jsessionid, $xBonitaAPIToken, $taskId)
     {
         try {
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
+
+            $response = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+            ])->get($url);
+
+            return $response->json();
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
+     * Obtener datos de la tarea aplicando filtros.
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
+     * @param  string $filter
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function taskDataFiltered($jsessionid, $xBonitaAPIToken, $filter)
+    {
+        try {
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?{$filter}");
 
             $response = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
@@ -78,6 +102,30 @@ class BonitaTaskHelper
 
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
+
+            $response = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+            ])->get($url);
+
+            return $response->json();
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
+     * Obtener las tareas tomadas por el usuario con id.
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
+     * @param  int $bonitaUserId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function userTasks($jsessionid, $xBonitaAPIToken, $bonitaUserId)
+    {
+        try {
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=assigned_id={$bonitaUserId}&f=state=ready");
 
             $response = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
