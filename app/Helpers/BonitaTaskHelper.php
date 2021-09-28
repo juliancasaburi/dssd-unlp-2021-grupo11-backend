@@ -11,6 +11,30 @@ use App\Helpers\BonitaProcessHelper;
 class BonitaTaskHelper
 {
     /**
+     * Obtener datos de la tarea con id.
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
+     * @param  int $taskId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function taskData($jsessionid, $xBonitaAPIToken, $taskId)
+    {
+        try {
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
+
+            $response = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+            ])->get($url);
+
+            return $response->json();
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
      * Obtener datos de la próxima tarea a realizar por el usuario autenticado.
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken

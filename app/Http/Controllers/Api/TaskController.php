@@ -68,18 +68,12 @@ class TaskController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
-
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $response = $bonitaTaskHelper->taskData($jsessionid, $xBonitaAPIToken, $taskId);
 
             if ($response["assigned_id"] != 0)
                 return response()->json("La tarea ya se encuentra asignada. Primero debe ser liberada.", 403); 
 
-            $bonitaTaskHelper = new BonitaTaskHelper();
             $response = $bonitaTaskHelper->assignTask($jsessionid, $xBonitaAPIToken, $taskId, auth()->user()->bonita_user_id);
 
             return response()->json("Tarea asignada", 200);
@@ -100,13 +94,8 @@ class TaskController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
-
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $response = $bonitaTaskHelper->taskData($jsessionid, $xBonitaAPIToken, $taskId);
 
             if (!$response["assigned_id"] == auth()->user()->bonita_user_id)
                 return response()->json("La tarea se encuentra asignada a otro usuario. No puedes liberarla.", 403); 
