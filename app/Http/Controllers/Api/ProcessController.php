@@ -13,6 +13,7 @@ class ProcessController extends Controller
     /**
      * Get processes.
      *
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
@@ -49,6 +50,7 @@ class ProcessController extends Controller
     /**
      * Obtener datos del proceso de Registro de Sociedad Anónima.
      *
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function processRegistroSociedadAnonima(Request $request)
