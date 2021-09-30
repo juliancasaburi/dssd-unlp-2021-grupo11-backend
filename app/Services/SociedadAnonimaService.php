@@ -6,9 +6,15 @@ use App\Models\SociedadAnonima;
 use App\Models\Socio;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Config;
 
 class SociedadAnonimaService
 {
+    public function getPrivateFolderUrl(string $nombreSociedad) {
+        $metaData = Storage::disk('google')->getDriver()->getAdapter()->getMetaData("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombreSociedad}");
+        return "https://drive.google.com/drive/folders{$metaData["virtual_path"]}";
+    }
+
     public function storeNewSociedadAnonima(
         $archivoEstatuto,
         string $nombre,
@@ -27,9 +33,10 @@ class SociedadAnonimaService
         $sociedadAnonima->estado_evaluacion = "Pendiente mesa de entradas";
         $sociedadAnonima->bonita_case_id = $bonitaCaseId;
 
-        Storage::disk('google')->createDir($nombre);
-        $metaData = Storage::disk('google')->getMetaData($nombre);
-        $archivoEstatuto->storeAs($metaData["path"], "estatuto_{$nombre}.{$archivoEstatuto->extension()}", 'google');
+        $config = new Config();
+        Storage::disk('google')->getDriver()->getAdapter()->createDir("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombre}", $config);
+        $archivoEstatuto->storeAs("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombre}", "estatuto_{$nombre}.{$archivoEstatuto->extension()}", 'google');
+        Storage::disk('google')->getDriver()->getAdapter()->setVisibility("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombre}", "public");
 
         $sociedadAnonima->save();
 
