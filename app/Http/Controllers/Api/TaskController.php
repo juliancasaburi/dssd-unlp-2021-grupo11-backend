@@ -25,7 +25,7 @@ class TaskController extends Controller
             $bonitaTaskHelper = new BonitaTaskHelper();
             $response = $bonitaTaskHelper->nextTask($jsessionid, $xBonitaAPIToken, auth()->user()->getRoleNames());
 
-            $responseData = $response[0];
+            $responseData = head($response);
             $sociedad = SociedadAnonima::with(['apoderado', 'socios'])->where('bonita_case_id', $responseData["caseId"])->first();
             $responseData["datosSociedad"] = $sociedad;
 

@@ -82,7 +82,7 @@ class BonitaProcessHelper
                 'Cookie' => 'JSESSIONID=' . $jsessionid,
             ])->get($url);
 
-            $processId = $response[0]['id'];
+            $processId = head($response->json())['id'];
 
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process/' . $processId . '/instantiation');
 
