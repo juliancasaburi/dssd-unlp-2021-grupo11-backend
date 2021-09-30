@@ -106,7 +106,7 @@ class SociedadAnonimaController extends Controller
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
-                'archivo_estatuto' => 'mimes:pdf,doc,docx'
+                'archivo_estatuto' => 'mimes:docx,odt,pdf'
                 // TODO: validar datos de cada socio
             ]);
 
