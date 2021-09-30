@@ -188,6 +188,37 @@ class BonitaTaskHelper
     }
 
     /**
+     * Ejecutar una tarea, y opcionalmente asigna.
+     *
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
+     * @param  string $taskId
+     * @param  array $dataArray
+     * @param bool $assign
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function executeTask($jsessionid, $xBonitaAPIToken, $taskId, $assign = false)
+    {
+        try {
+            $urlHelper = new URLHelper();
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/userTask/' . $taskId . '/execution');
+
+            if($assign == true)
+                $url = $url . '?assign=true';
+
+            $response = Http::withHeaders([
+                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+                'X-Bonita-API-Token' => $xBonitaAPIToken,
+                'Content-Type' => 'application/json',
+            ])->withBody(null, 'application/json')->post($url);
+
+            return $response->json();
+        } catch (ConnectionException $e) {
+            return response()->json("500 Internal Server Error", 500);
+        }
+    }
+
+    /**
      * Asignar tarea con id al usuario autenticado.
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken

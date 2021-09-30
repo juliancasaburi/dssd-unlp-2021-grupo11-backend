@@ -55,10 +55,7 @@ class SociedadAnonimaController extends Controller
             return response()->json("No puedes aprobar/rechazar esta tarea.", 403);
 
         // Completar la tarea en Bonita
-        $updateTaskDataArray = [
-            "state" => "completed",
-        ];
-        $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
 
         // Actualizar el case de Bonita
         $bonitaCaseId = $response["caseId"];
@@ -127,11 +124,8 @@ class SociedadAnonimaController extends Controller
             /* Se marca la primera actividad como completada */
             $bonitaTaskHelper = new BonitaTaskHelper();
             $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-            $updateTaskDataArray = [
-                "assigned_id" => JWTAuth::user()->bonita_user_id,
-                "state" => "completed",
-            ];
-            $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], $updateTaskDataArray);
+            $a = $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
+            return response()->json($a);
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Pendiente mesa de entradas");
 
 
