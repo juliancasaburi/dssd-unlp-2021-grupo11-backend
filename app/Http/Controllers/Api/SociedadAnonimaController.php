@@ -58,8 +58,7 @@ class SociedadAnonimaController extends Controller
         $updateTaskDataArray = [
             "state" => "completed",
         ];
-        $bonitaProcessHelper = new BonitaProcessHelper();
-        $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+        $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
 
         // Actualizar el case de Bonita
         $bonitaCaseId = $response["caseId"];
@@ -68,6 +67,7 @@ class SociedadAnonimaController extends Controller
         $aprobado = $request->input('aprobado');
         $rol = auth()->user()->getRoleNames()->first();
         $nuevoEstadoEvaluacion = '';
+        $bonitaProcessHelper = new BonitaProcessHelper();
 
         if ($aprobado) {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
@@ -81,7 +81,7 @@ class SociedadAnonimaController extends Controller
 
         // estado_evaluacion
         $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
-        $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+        $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
 
         // Actualizar la SociedadAnonima
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
@@ -117,19 +117,21 @@ class SociedadAnonimaController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            /* Se crea la instancia (case) del proceso en Bonita, se asignan variables y
-            se marca la primera actividad como completada */
+            /* Se crea la instancia (case) del proceso en Bonita y  se asignan variables */
             $bonitaProcessHelper = new BonitaProcessHelper();
             $startProcessResponse = $bonitaProcessHelper->startProcessByName($jsessionid, $xBonitaAPIToken, "Registro");
             $bonitaCaseId = $startProcessResponse->original->caseId;
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "nombre_sociedad", "java.lang.String", $request->input('nombre'));
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "email_apoderado", "java.lang.String", $request->input('email_apoderado'));
-            $userTasksResponse = $bonitaProcessHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+            
+            /* Se marca la primera actividad como completada */
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
             $updateTaskDataArray = [
                 "assigned_id" => JWTAuth::user()->bonita_user_id,
                 "state" => "completed",
             ];
-            $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $userTasksResponse[0]["id"], $updateTaskDataArray);
+            $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $userTasksResponse[0]["id"], $updateTaskDataArray);
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Pendiente mesa de entradas");
 
 
