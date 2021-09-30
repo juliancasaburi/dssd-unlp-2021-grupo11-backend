@@ -10,9 +10,17 @@ use League\Flysystem\Config;
 
 class SociedadAnonimaService
 {
+    private function getPrivateFolderPathFromConfig(){
+        return config('filesystems.disks.google.folder'). "/" . config('filesystems.disks.google.private_folder');
+    }
+
+    private function getPublicFolderPathFromConfig(){
+        return config('filesystems.disks.google.folder'). "/" . config('filesystems.disks.google.public_folder');
+    }
+
     public function getPrivateFolderUrl(string $nombreSociedad) {
-        $metaData = Storage::disk('google')->getDriver()->getAdapter()->getMetaData("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombreSociedad}");
-        return "https://drive.google.com/drive/folders{$metaData["virtual_path"]}";
+        $metaData = Storage::disk('google')->getDriver()->getAdapter()->getMetaData("{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}");
+        return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
     }
 
     public function storeNewSociedadAnonima(
@@ -34,9 +42,10 @@ class SociedadAnonimaService
         $sociedadAnonima->bonita_case_id = $bonitaCaseId;
 
         $config = new Config();
-        Storage::disk('google')->getDriver()->getAdapter()->createDir("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombre}", $config);
-        $archivoEstatuto->storeAs("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombre}", "estatuto_{$nombre}.{$archivoEstatuto->extension()}", 'google');
-        Storage::disk('google')->getDriver()->getAdapter()->setVisibility("DSSD-UNLP-2021-GRUPO11-BACKEND/Privado/{$nombre}", "public");
+        $newFolderPath = "{$this->getPrivateFolderPathFromConfig()}/{$nombre}";
+        Storage::disk('google')->getDriver()->getAdapter()->createDir($newFolderPath, $config);
+        $archivoEstatuto->storeAs($newFolderPath, "estatuto_{$nombre}.{$archivoEstatuto->extension()}", 'google');
+        Storage::disk('google')->getDriver()->getAdapter()->setVisibility($newFolderPath, "public");
 
         $sociedadAnonima->save();
 

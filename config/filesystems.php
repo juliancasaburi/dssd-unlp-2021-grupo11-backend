@@ -58,6 +58,8 @@ return [
             'clientSecret' => env('MAIN_GOOGLE_DRIVE_CLIENT_SECRET'),
             'refreshToken' => env('MAIN_GOOGLE_DRIVE_REFRESH_TOKEN'),
             'folder' => env('MAIN_GOOGLE_DRIVE_FOLDER'),
+            'private_folder' => env('MAIN_GOOGLE_DRIVE_PRIVATE_FOLDER'),
+            'public_folder' => env('MAIN_GOOGLE_DRIVE_PUBLIC_FOLDER'),
         ],
 
     ],
