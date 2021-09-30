@@ -36,7 +36,7 @@ class BonitaMembershipHelper
         $response = $client->request('GET', $url);
         $response_body = json_decode($response->getBody()->getContents(), true);
 
-        return $response_body[0]["id"];
+        return head($response_body)["id"];
     }
 
     /**
@@ -67,6 +67,6 @@ class BonitaMembershipHelper
         $response = $client->request('GET', $url);
         $response_body = json_decode($response->getBody()->getContents(), true);
 
-        return $response_body[0]["id"];
+        return head($response_body)["id"];
     }
 }

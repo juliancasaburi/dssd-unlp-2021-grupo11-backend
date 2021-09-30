@@ -131,7 +131,7 @@ class SociedadAnonimaController extends Controller
                 "assigned_id" => JWTAuth::user()->bonita_user_id,
                 "state" => "completed",
             ];
-            $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $userTasksResponse[0]["id"], $updateTaskDataArray);
+            $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], $updateTaskDataArray);
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Pendiente mesa de entradas");
 
 
