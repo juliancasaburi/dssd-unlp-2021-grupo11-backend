@@ -68,12 +68,18 @@ class SociedadAnonimaController extends Controller
         $aprobado = $request->input('aprobado');
         $rol = auth()->user()->getRoleNames()->first();
         $nuevoEstadoEvaluacion = '';
+
         if ($aprobado) {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
+
+            // Setear numero_expediente
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
+
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
         }
 
+        // estado_evaluacion
         $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
         $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
 
@@ -107,8 +113,6 @@ class SociedadAnonimaController extends Controller
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 400);
             }
-
-            /* TODO: almacenar el archivo del estatuto, que viene en la request */
 
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
