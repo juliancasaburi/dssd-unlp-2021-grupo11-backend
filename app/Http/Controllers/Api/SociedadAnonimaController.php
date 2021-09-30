@@ -9,7 +9,6 @@ use App\Helpers\BonitaProcessHelper;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Services\SociedadAnonimaService;
 use App\Helpers\BonitaTaskHelper;
-use App\Models\SociedadAnonima;
 
 class SociedadAnonimaController extends Controller
 {
@@ -75,6 +74,7 @@ class SociedadAnonimaController extends Controller
         }
 
         $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+        $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
 
         // Actualizar la SociedadAnonima
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
