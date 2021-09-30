@@ -32,6 +32,7 @@ class SociedadAnonimaController extends Controller
     public function getSociedadAnonimaByCaseId(SociedadAnonimaService $service, $bonitaCaseId)
     {
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($bonitaCaseId);
+        $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
         return response()->json($sociedadAnonima, 200);
     }
 
