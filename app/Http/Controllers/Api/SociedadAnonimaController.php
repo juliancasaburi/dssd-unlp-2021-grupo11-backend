@@ -54,19 +54,15 @@ class SociedadAnonimaController extends Controller
         if ($response["state"] != "ready" or $response["assigned_id"] != auth()->user()->bonita_user_id)
             return response()->json("No puedes aprobar/rechazar esta tarea.", 403);
 
-        // Completar la tarea en Bonita
-        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
-
         // Actualizar el case de Bonita
         $bonitaCaseId = $response["caseId"];
         $sociedadAnonima = $service->getSociedadAnonimaByCaseId($bonitaCaseId);
 
-        $aprobado = $request->input('aprobado');
         $rol = auth()->user()->getRoleNames()->first();
         $nuevoEstadoEvaluacion = '';
         $bonitaProcessHelper = new BonitaProcessHelper();
 
-        if ($aprobado) {
+        if ($request->input('aprobado') == "true") {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
             // Setear numero_expediente
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
@@ -76,7 +72,10 @@ class SociedadAnonimaController extends Controller
 
         // estado_evaluacion
         $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
-        $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+        //$bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+
+        // Completar la tarea en Bonita
+        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
 
         // Actualizar la SociedadAnonima
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
