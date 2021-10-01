@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Wildside\Userstamps\Userstamps;
+use App\Models\Socio;
+
 class SociedadAnonima extends Model
 {
     use Userstamps;
@@ -31,7 +33,7 @@ class SociedadAnonima extends Model
         'url_codigo_QR',
         'estado_evaluacion',
         'bonita_case_id',
-        'id_apoderado',
+        'apoderado_id',
     ];
 
     /**
@@ -48,7 +50,7 @@ class SociedadAnonima extends Model
      */
     public function socios()
     {
-        return $this->hasMany(Socio::class, 'id_sociedad');
+        return $this->hasMany(Socio::class);
     }
 
     /**
@@ -56,6 +58,6 @@ class SociedadAnonima extends Model
      */
     public function apoderado()
     {
-        return $this->hasOne(Socio::class, 'id_sociedad');
+        return Socio::find($this->apoderado_id);
     }
 }

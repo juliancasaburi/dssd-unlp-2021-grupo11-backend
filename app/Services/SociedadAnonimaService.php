@@ -80,10 +80,10 @@ class SociedadAnonimaService
             $socio->apellido = $datosSocio["apellido"];
             $socio->nombre = $datosSocio["nombre"];
             $socio->porcentaje = $datosSocio["porcentaje"];
-            $socio->id_sociedad = $sociedadAnonima->id;
+            $socio->sociedad_anonima_id = $sociedadAnonima->id;
             $socio->save();
             if ($datosSocio["apoderado"] == "true") {
-                $sociedadAnonima->id_apoderado = $socio->id;
+                $sociedadAnonima->apoderado_id = $socio->id;
             }
         }
         $sociedadAnonima->save();
