@@ -18,6 +18,17 @@ class SociedadAnonima extends Model
     protected $table = 'sociedades_anonimas';
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'bonita_case_id',
+        'created_by',
+        'updated_by',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array

@@ -31,6 +31,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      * @var array
      */
     protected $hidden = [
+        'bonita_user_id',
         'password',
         'remember_token',
     ];
