@@ -124,8 +124,7 @@ class SociedadAnonimaController extends Controller
             /* Se marca la primera actividad como completada */
             $bonitaTaskHelper = new BonitaTaskHelper();
             $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-            $a = $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
-            return response()->json($a);
+            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Pendiente mesa de entradas");
 
 

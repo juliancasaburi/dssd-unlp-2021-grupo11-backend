@@ -11,11 +11,11 @@ use League\Flysystem\Config;
 class SociedadAnonimaService
 {
     private function getPrivateFolderPathFromConfig(){
-        return config('filesystems.disks.google.folder'). "/" . config('filesystems.disks.google.private_folder');
+        return config('filesystems.disks.google.private_folder');
     }
 
     private function getPublicFolderPathFromConfig(){
-        return config('filesystems.disks.google.folder'). "/" . config('filesystems.disks.google.public_folder');
+        return config('filesystems.disks.google.public_folder');
     }
 
     public function getPrivateFolderUrl(string $nombreSociedad) {
