@@ -11,6 +11,7 @@ use App\Helpers\URLHelper;
 use App\Models\User;
 use App\Helpers\BonitaMembershipHelper;
 use App\Helpers\BonitaUserHelper;
+use App\Http\Resources\User as UserResource;
 class AuthController extends Controller
 {
     /**
@@ -39,8 +40,7 @@ class AuthController extends Controller
             if ($response->status() == 401)
                 return response()->json("401 Unauthorized", 401);
 
-            $user = auth('api')->user();
-            $user["roles"] = $user->getRoleNames();
+            $user = new UserResource(auth('api')->user());
 
             return $this->respondWithTokenCookiesAndUser($token, $response->cookies()->toArray(), $user);
         } catch (ConnectionException $e) {
@@ -171,8 +171,7 @@ class AuthController extends Controller
             /* Return response */
             return response()->json([
                 'message' => 'Usuario registrado exitosamente.',
-                'api-user' => $user,
-                'bonita-user' => $bonitaUserData,
+                'api-user' => new UserResource($user),
             ], 201);
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);

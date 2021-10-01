@@ -19,8 +19,7 @@ class SociedadAnonimaController extends Controller
      */
     public function getUserSociedadesAnonimas(SociedadAnonimaService $service)
     {
-        $sociedadesAnonimasUsuarioLogueado = $service->getUserSociedadesAnonimasWithSocios(auth()->user());
-        return response()->json($sociedadesAnonimasUsuarioLogueado, 200);
+        return response()->json($service->getUserSociedadesAnonimasWithSocios(auth()->user()), 200);
     }
 
     /**
@@ -96,7 +95,7 @@ class SociedadAnonimaController extends Controller
         try {
             $sociedadAnonima = SociedadAnonima::find($idSociedad)->value('nombre');
 
-            if($sociedadAnonima->estado_evaluacion != 'Rechazado por escribano-area-legales')
+            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por escribano-area-legales')
                 return response()->json("No puedes modificar el estatuto de esta S.A.", 403);
 
             $validator = Validator::make($request->all(), [
