@@ -7,6 +7,7 @@ use App\Models\Socio;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Config;
+use Illuminate\Support\Carbon;
 
 class SociedadAnonimaService
 {
@@ -21,6 +22,27 @@ class SociedadAnonimaService
     public function getPrivateFolderUrl(string $nombreSociedad) {
         $metaData = Storage::disk('google')->getDriver()->getAdapter()->getMetaData("{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}");
         return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
+    }
+
+    private function getSociedadFolderPath($nombreSociedad)
+    {
+        return "{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}/";
+    }
+
+    private function storeEstatutoFile($archivoEstatuto, $nombreSociedad)
+    {
+
+        $newFolderPath = $this->getSociedadFolderPath($nombreSociedad) . Carbon::now('GMT-3')->format('d-m-y-H-i');
+        $archivoEstatuto->storeAs($newFolderPath, "estatuto_{$nombreSociedad}.{$archivoEstatuto->extension()}", 'google');
+    }
+
+    private function createSociedadFolder($nombreSociedad)
+    {
+        $config = new Config();
+        $folderPath = $this->getSociedadFolderPath($nombreSociedad);
+
+        Storage::disk('google')->getDriver()->getAdapter()->createDir($folderPath, $config);
+        Storage::disk('google')->getDriver()->getAdapter()->setVisibility($folderPath, "public");
     }
 
     public function storeNewSociedadAnonima(
@@ -41,11 +63,8 @@ class SociedadAnonimaService
         $sociedadAnonima->estado_evaluacion = "Pendiente mesa de entradas";
         $sociedadAnonima->bonita_case_id = $bonitaCaseId;
 
-        $config = new Config();
-        $newFolderPath = "{$this->getPrivateFolderPathFromConfig()}/{$nombre}";
-        Storage::disk('google')->getDriver()->getAdapter()->createDir($newFolderPath, $config);
-        $archivoEstatuto->storeAs($newFolderPath, "estatuto_{$nombre}.{$archivoEstatuto->extension()}", 'google');
-        Storage::disk('google')->getDriver()->getAdapter()->setVisibility($newFolderPath, "public");
+        $this->createSociedadFolder($nombre);
+        $this->storeEstatutoFile($archivoEstatuto, $nombre);
 
         $sociedadAnonima->save();
 
@@ -68,6 +87,13 @@ class SociedadAnonimaService
             }
         }
         $sociedadAnonima->save();
+    }
+
+    public function updateEstatuto(
+        $archivoEstatuto,
+        $nombreSociedad,
+    ) {
+        $this->storeEstatutoFile($archivoEstatuto, $nombreSociedad);
     }
 
     public function getUserSociedadesAnonimasWithSocios(User $user)
