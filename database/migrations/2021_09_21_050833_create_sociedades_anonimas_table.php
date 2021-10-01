@@ -25,20 +25,20 @@ class CreateSociedadesAnonimasTable extends Migration
             $table->string('url_codigo_QR')->nullable();
             $table->string('estado_evaluacion');
             $table->string('bonita_case_id');
-            $table->unsignedBigInteger('id_apoderado')->unsigned()->nullable();
+            $table->unsignedBigInteger('apoderado_id')->unsigned()->nullable();
             $table->timestamps();
 
             // User stamps
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
 
-            $table->foreign('id_apoderado')
+            $table->foreign('apoderado_id')
                 ->references('id')
                 ->on('socios');
         });
 
         Schema::table('socios', function (Blueprint $table) {
-            $table->foreign('id_sociedad')
+            $table->foreign('sociedad_anonima_id')
                 ->references('id')
                 ->on('sociedades_anonimas')
                 ->onDelete('cascade');
