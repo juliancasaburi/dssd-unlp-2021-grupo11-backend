@@ -46,34 +46,4 @@ class ProcessController extends Controller
         $bonitaProcessHelper = new BonitaProcessHelper();
         return $bonitaProcessHelper->processByName($jsessionid, $name);
     }
-
-    /**
-     * Obtener datos del proceso de Registro de Sociedad Anónima.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function processRegistroSociedadAnonima(Request $request)
-    {
-        $jsessionid = $request->cookie('JSESSIONID');
-
-        $bonitaProcessHelper = new BonitaProcessHelper();
-        return $bonitaProcessHelper->processByName($jsessionid, "Registro");
-    }
-
-    /**
-     * Iniciar el proceso con nombre.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $name
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function startProcessByName(Request $request, $name)
-    {
-        $jsessionid = $request->cookie('JSESSIONID');
-        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-
-        $bonitaProcessHelper = new BonitaProcessHelper();
-        return $bonitaProcessHelper->startProcessByName($jsessionid, $xBonitaAPIToken, $name);
-    }
 }
