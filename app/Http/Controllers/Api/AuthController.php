@@ -137,7 +137,7 @@ class AuthController extends Controller
 
             /* Register Bonita User */
             $bonitaUserHelper = new BonitaUserHelper();
-            $bonitaRegisterResponse = $bonitaUserHelper->registerUser($jsessionid, $xBonitaAPIToken, $request->all());
+            $bonitaRegisterResponse = $bonitaUserHelper->registerUser($jsessionid, $xBonitaAPIToken, $validator->validated());
             if ($bonitaRegisterResponse->status() != 200)
                 return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
 
