@@ -16,14 +16,14 @@ class Socio extends Model
         'apellido',
         'nombre',
         'porcentaje',
-        'id_sociedad',
+        'sociedad_anonima_id',
     ];
 
     /**
-     * Obtener la sociedad.
+     * Obtener la sociedad anonima.
      */
-    public function sociedad()
+    public function sociedadAnonima()
     {
-        return $this->belongsTo(SociedadAnonima::class, 'id');
+        return $this->belongsTo(SociedadAnonima::class);
     }
 }
