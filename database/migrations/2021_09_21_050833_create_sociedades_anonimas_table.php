@@ -25,7 +25,7 @@ class CreateSociedadesAnonimasTable extends Migration
             $table->string('url_codigo_QR')->nullable();
             $table->string('estado_evaluacion');
             $table->string('bonita_case_id');
-            $table->unsignedBigInteger('apoderado_id')->unsigned()->nullable();
+            $table->unsignedBigInteger('apoderado_id')->nullable();
             $table->timestamps();
 
             // User stamps
