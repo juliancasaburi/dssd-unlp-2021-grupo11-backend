@@ -233,8 +233,7 @@ class BonitaTaskHelper
                 "assigned_id" => $bonitaUserId,
             ];
 
-            $bonitaProcessHelper = new BonitaProcessHelper();
-            $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+            $this->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
@@ -254,9 +253,8 @@ class BonitaTaskHelper
             $updateTaskDataArray = [
                 "assigned_id" => $bonitaUserId,
             ];
-
-            $bonitaProcessHelper = new BonitaProcessHelper();
-            $bonitaProcessHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+            
+            $this->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
