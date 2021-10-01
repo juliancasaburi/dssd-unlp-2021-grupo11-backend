@@ -84,16 +84,75 @@ class SociedadAnonimaController extends Controller
     }
 
     /**
+     * Corregir una SociedadAnonima rechazada por mesa de entradas.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request $idSociedad
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function patchSociedadAnonima(SociedadAnonimaService $service, Request $request, $idSociedad)
+    {
+        try {
+            $sociedadAnonima = SociedadAnonima::find($idSociedad);
+
+            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por empleado-mesa-de-entradas')
+                return response()->json("No puedes corregir esta S.A.", 403);
+
+            $validator = Validator::make($request->all(), [
+                'fecha_creacion' => 'required|date|',
+                'domicilio_legal' => 'required|string|between:2,100',
+                'domicilio_real' => 'required|string|between:2,100',
+                'email_apoderado' => 'required|string|email',
+                'socios' => 'required|json',
+
+                /* TODO: validar datos de cada socio.
+                    Fundamentalmente que el total de aportes entre todos los socios = 100 */
+
+            ]);
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+
+            $service->updateSociedadAnonima(
+                $sociedadAnonima,
+                $request->input('fecha_creacion'),
+                $request->input('domicilio_legal'),
+                $request->input('domicilio_real'),
+                $request->input('email_apoderado'),
+            );
+
+            $service->updateSocios(
+                $sociedadAnonima,
+                json_decode($request->input('socios'), true),
+            );
+
+            /* Se marca la actividad como completada */
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+            $bonitaProcessHelper = new BonitaProcessHelper();
+            $bonitaCaseId = $sociedadAnonima->bonita_case_id;
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "email_apoderado", "java.lang.String", $request->input('email_apoderado'));
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
+
+            return response()->json("S.A. actualizada", 200);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Actualizar el estatuto.
      *
      * @param  \Illuminate\Http\Request $request
-     * * @param  \Illuminate\Http\Request $idSociedad
+     * @param  \Illuminate\Http\Request $idSociedad
      * @return \Illuminate\Http\JsonResponse
      */
     public function updateEstatuto(SociedadAnonimaService $service, Request $request, $idSociedad)
     {
         try {
-            $sociedadAnonima = SociedadAnonima::find($idSociedad)->value('nombre');
+            $sociedadAnonima = SociedadAnonima::find($idSociedad);
 
             if ($sociedadAnonima->estado_evaluacion != 'Rechazado por escribano-area-legales')
                 return response()->json("No puedes modificar el estatuto de esta S.A.", 403);

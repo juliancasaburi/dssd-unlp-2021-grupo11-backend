@@ -11,15 +11,18 @@ use Illuminate\Support\Carbon;
 
 class SociedadAnonimaService
 {
-    private function getPrivateFolderPathFromConfig(){
+    private function getPrivateFolderPathFromConfig()
+    {
         return config('filesystems.disks.google.private_folder');
     }
 
-    private function getPublicFolderPathFromConfig(){
+    private function getPublicFolderPathFromConfig()
+    {
         return config('filesystems.disks.google.public_folder');
     }
 
-    public function getPrivateFolderUrl(string $nombreSociedad) {
+    public function getPrivateFolderUrl(string $nombreSociedad)
+    {
         $metaData = Storage::disk('google')->getDriver()->getAdapter()->getMetaData("{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}");
         return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
     }
@@ -86,6 +89,43 @@ class SociedadAnonimaService
                 $sociedadAnonima->apoderado_id = $socio->id;
             }
         }
+        $sociedadAnonima->save();
+    }
+
+    public function updateSociedadAnonima(
+        SociedadAnonima $sociedadAnonima,
+        string $fecha_creacion,
+        string $domicilio_legal,
+        string $domicilio_real,
+        string $email_apoderado
+    ) {
+        $sociedadAnonima->fecha_creacion = $fecha_creacion;
+        $sociedadAnonima->domicilio_legal = $domicilio_legal;
+        $sociedadAnonima->domicilio_real = $domicilio_real;
+        $sociedadAnonima->email_apoderado = $email_apoderado;
+        $sociedadAnonima->estado_evaluacion = "Pendiente mesa de entradas";
+
+        $sociedadAnonima->save();
+    }
+
+    public function updateSocios(
+        SociedadAnonima $sociedadAnonima,
+        array $socios
+    ) {
+        $sociedadAnonima->socios()->delete();
+
+        foreach ($socios as $datosSocio) {
+            $socio = new Socio();
+            $socio->apellido = $datosSocio["apellido"];
+            $socio->nombre = $datosSocio["nombre"];
+            $socio->porcentaje = $datosSocio["porcentaje"];
+            $socio->sociedad_anonima_id = $sociedadAnonima->id;
+            $socio->save();
+            if ($datosSocio["apoderado"] == "true") {
+                $sociedadAnonima->apoderado_id = $socio->id;
+            }
+        }
+        
         $sociedadAnonima->save();
     }
 
