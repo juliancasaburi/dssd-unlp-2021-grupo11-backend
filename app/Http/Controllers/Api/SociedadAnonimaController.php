@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Helpers\BonitaProcessHelper;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Services\SociedadAnonimaService;
 use App\Helpers\BonitaTaskHelper;
+use App\Models\SociedadAnonima;
 
 class SociedadAnonimaController extends Controller
 {
@@ -71,7 +71,6 @@ class SociedadAnonimaController extends Controller
 
             // Setear numero_expediente
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
-
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
         }
@@ -85,6 +84,40 @@ class SociedadAnonimaController extends Controller
         $sociedadAnonima->save();
 
         return response()->json("Tarea aprobada/rechazada", 200);
+    }
+
+    /**
+     * Actualizar el estatuto.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * * @param  \Illuminate\Http\Request $idSociedad
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateEstatuto(SociedadAnonimaService $service, Request $request, $idSociedad)
+    {
+        try {
+            $sociedadAnonima = SociedadAnonima::find($idSociedad)->value('nombre');
+
+            if($sociedadAnonima->estado_evaluacion != 'Rechazado por escribano-area-legales')
+                return response()->json("No puedes modificar el estatuto de esta S.A.", 403);
+
+            $validator = Validator::make($request->all(), [
+                'archivo_estatuto' => 'mimes:docx,odt,pdf'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+
+            $service->updateEstatuto(
+                $request->file('archivo_estatuto'),
+                $idSociedad,
+            );
+
+            return response()->json("Estatuto actualizado", 200);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
     }
 
     /**
@@ -120,7 +153,7 @@ class SociedadAnonimaController extends Controller
             $bonitaCaseId = $startProcessResponse->original->caseId;
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "nombre_sociedad", "java.lang.String", $request->input('nombre'));
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "email_apoderado", "java.lang.String", $request->input('email_apoderado'));
-            
+
             /* Se marca la primera actividad como completada */
             $bonitaTaskHelper = new BonitaTaskHelper();
             $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
