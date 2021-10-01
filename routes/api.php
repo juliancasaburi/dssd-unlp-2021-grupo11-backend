@@ -31,11 +31,6 @@ Route::group(['middleware' => ['apiJwt']], function () {
 Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute']], function () {
     /* Auth */
     Route::post('auth/logout', [AuthController::class, 'logout']);
-    /* Process */
-    Route::get('process', [ProcessController::class, 'index']);
-    Route::get('process/{name}', [ProcessController::class, 'processByName']);
-    Route::get('processRegistroSociedadAnonima', [ProcessController::class, 'processRegistroSociedadAnonima']);
-    Route::post('process/{name}', [ProcessController::class, 'startProcessByName']); // To be deleted
 });
 
 /* Apoderado, JWT & Bonita token protected routes */
