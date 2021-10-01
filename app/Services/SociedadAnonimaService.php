@@ -91,7 +91,7 @@ class SociedadAnonimaService
 
     public function updateEstatuto(
         $archivoEstatuto,
-        $nombreSociedad,
+        $nombreSociedad
     ) {
         $this->storeEstatutoFile($archivoEstatuto, $nombreSociedad);
     }
