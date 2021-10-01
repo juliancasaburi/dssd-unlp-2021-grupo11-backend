@@ -68,7 +68,6 @@ class SociedadAnonimaController extends Controller
 
         if ($aprobado) {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
-
             // Setear numero_expediente
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
         } else {
@@ -144,7 +143,10 @@ class SociedadAnonimaController extends Controller
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
                 'archivo_estatuto' => 'mimes:docx,odt,pdf'
-                // TODO: validar datos de cada socio
+
+                /* TODO: validar datos de cada socio.
+                Fundamentalmente que el total de aportes entre todos los socios= 100 */
+
             ]);
 
             if ($validator->fails()) {
