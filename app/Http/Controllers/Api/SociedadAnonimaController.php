@@ -114,6 +114,13 @@ class SociedadAnonimaController extends Controller
                 $idSociedad,
             );
 
+            /* Se marca la actividad como completada */
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+            $bonitaTaskHelper = new BonitaTaskHelper();
+            $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $sociedadAnonima->bonita_case_id);
+            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
+
             return response()->json("Estatuto actualizado", 200);
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
