@@ -34,7 +34,8 @@ class CreateSociedadesAnonimasTable extends Migration
 
             $table->foreign('apoderado_id')
                 ->references('id')
-                ->on('socios');
+                ->on('socios')
+                ->nullOnDelete();
         });
 
         Schema::table('socios', function (Blueprint $table) {
