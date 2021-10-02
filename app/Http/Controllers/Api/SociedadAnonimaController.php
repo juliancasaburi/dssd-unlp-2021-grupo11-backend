@@ -9,6 +9,7 @@ use App\Helpers\BonitaProcessHelper;
 use App\Services\SociedadAnonimaService;
 use App\Helpers\BonitaTaskHelper;
 use App\Models\SociedadAnonima;
+use Illuminate\Validation\Rule;
 
 class SociedadAnonimaController extends Controller
 {
@@ -71,11 +72,8 @@ class SociedadAnonimaController extends Controller
 
         // estado_evaluacion
         $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
-        //$bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
-
         // Completar la tarea en Bonita
         $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
-
         // Actualizar la SociedadAnonima
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
         $sociedadAnonima->save();
@@ -98,19 +96,26 @@ class SociedadAnonimaController extends Controller
             if ($sociedadAnonima->estado_evaluacion != 'Rechazado por empleado-mesa-de-entradas')
                 return response()->json("No puedes corregir esta S.A.", 403);
 
-            $validator = Validator::make($request->all(), [
-                'fecha_creacion' => 'required|date|before_or_equal:now',
+            $sociedadAnonimaValidator = Validator::make($request->all(), [
+                'fecha_creacion' => 'required|date|',
                 'domicilio_legal' => 'required|string|between:2,100',
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
-
-                /* TODO: validar datos de cada socio.
-                    Fundamentalmente que el total de aportes entre todos los socios = 100 */
-
             ]);
-            if ($validator->fails()) {
-                return response()->json($validator->errors(), 400);
+
+            $sociosArray = json_decode($request->input('socios'), true);
+            $sociosValidator = Validator::make($sociosArray, [
+                '*.nombre' => 'required|string|between:2,100',
+                '*.apellido' => 'required|string|between:2,100',
+                '*.porcentaje' => 'required|numeric|between:0.01,100',
+                '*.apoderado' => ['required', Rule::in(['true', 'false'])]
+                //TODO: validar que el total de aportes entre todos los socios = 100
+            ]);
+
+            if ($sociedadAnonimaValidator->fails() || $sociosValidator->fails()) {
+                $errors = $sociedadAnonimaValidator->errors()->merge($sociosValidator->errors());
+                return response()->json($errors, 400);
             }
 
             $service->updateSociedadAnonima(
@@ -123,7 +128,7 @@ class SociedadAnonimaController extends Controller
 
             $service->updateSocios(
                 $sociedadAnonima,
-                json_decode($request->input('socios'), true),
+                $sociosArray,
             );
 
             /* Se marca la actividad como completada */
@@ -192,7 +197,7 @@ class SociedadAnonimaController extends Controller
     public function register(SociedadAnonimaService $service, Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            $sociedadAnonimaValidator = Validator::make($request->all(), [
                 'nombre' => 'required|string|between:2,100|unique:sociedades_anonimas',
                 'fecha_creacion' => 'required|date|before_or_equal:now',
                 'domicilio_legal' => 'required|string|between:2,100',
@@ -200,14 +205,20 @@ class SociedadAnonimaController extends Controller
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
                 'archivo_estatuto' => 'mimes:docx,odt,pdf'
-
-                /* TODO: validar datos de cada socio.
-                Fundamentalmente que el total de aportes entre todos los socios= 100 */
-
             ]);
 
-            if ($validator->fails()) {
-                return response()->json($validator->errors(), 400);
+            $sociosArray = json_decode($request->input('socios'), true);
+            $sociosValidator = Validator::make($sociosArray, [
+                '*.nombre' => 'required|string|between:2,100',
+                '*.apellido' => 'required|string|between:2,100',
+                '*.porcentaje' => 'required|numeric|between:0.01,100',
+                '*.apoderado' => ['required', Rule::in(['true', 'false'])]
+                //TODO: validar que el total de aportes entre todos los socios = 100
+            ]);
+
+            if ($sociedadAnonimaValidator->fails() || $sociosValidator->fails()) {
+                $errors = $sociedadAnonimaValidator->errors()->merge($sociosValidator->errors());
+                return response()->json($errors, 400);
             }
 
             $jsessionid = $request->cookie('JSESSIONID');
@@ -241,7 +252,7 @@ class SociedadAnonimaController extends Controller
                 /* Guardar socios */
                 $sociedadAnonima = $service->storeSocios(
                     $sociedadAnonima,
-                    json_decode($request->input('socios'), true),
+                    $sociosArray,
                 );
 
                 return response()->json("Solicitud creada", 200);
