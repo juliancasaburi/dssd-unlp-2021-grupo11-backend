@@ -99,7 +99,7 @@ class SociedadAnonimaController extends Controller
                 return response()->json("No puedes corregir esta S.A.", 403);
 
             $validator = Validator::make($request->all(), [
-                'fecha_creacion' => 'required|date|',
+                'fecha_creacion' => 'required|date|before_or_equal:now',
                 'domicilio_legal' => 'required|string|between:2,100',
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
@@ -194,7 +194,7 @@ class SociedadAnonimaController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'nombre' => 'required|string|between:2,100|unique:sociedades_anonimas',
-                'fecha_creacion' => 'required|date|',
+                'fecha_creacion' => 'required|date|before_or_equal:now',
                 'domicilio_legal' => 'required|string|between:2,100',
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
