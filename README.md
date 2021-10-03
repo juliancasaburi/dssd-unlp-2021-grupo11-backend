@@ -57,6 +57,28 @@ php artisan jwt:secret
 php artisan migrate
 ```
 
+_Configure las variables de entorno_
+
+Configure las variables relacionadas a Bonita, Google Drive y CORS en el archivo .env.  
+
+Ejemplo sin credenciales:
+
+```
+BONITA_API_URL=http://172.17.0.1:11775/bonita
+BONITA_ADMIN_USER=
+BONITA_ADMIN_PASSWORD=
+
+FILESYSTEM_CLOUD=google
+MAIN_GOOGLE_DRIVE_CLIENT_ID=
+MAIN_GOOGLE_DRIVE_CLIENT_SECRET=
+MAIN_GOOGLE_DRIVE_REFRESH_TOKEN=
+MAIN_GOOGLE_DRIVE_FOLDER=DSSD-UNLP-2021-GRUPO11-BACKEND
+MAIN_GOOGLE_DRIVE_PRIVATE_FOLDER=Privado
+MAIN_GOOGLE_DRIVE_PUBLIC_FOLDER=Publico
+
+FRONTEND_ENDPOINT=http://localhost:3002
+```
+
 ## Database Seeding
 
 _Para cargar los usuarios existentes en la aplicación de Bonita, siga los siguientes pasos_
