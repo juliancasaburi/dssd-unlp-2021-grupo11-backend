@@ -11,15 +11,13 @@ class BonitaMembershipHelper
     /**
      * Obtener id del grupo por nombre.
      *
-     * @param Illuminate\Http\Request $request
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
      * @param  string  $groupName
      * @return string
      */
-    public function groupIdByName($request, $groupName)
+    public function groupIdByName($jsessionid, $xBonitaAPIToken, $groupName)
     {
-        $jsessionid = $request->cookie('JSESSIONID');
-        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-
         $urlHelper = new URLHelper();
         $url = $urlHelper->getBonitaEndpointURL('/API/identity/group?p=0&f=name%3d' . $groupName);
 
@@ -42,15 +40,13 @@ class BonitaMembershipHelper
     /**
      * Obtener id del rol por nombre.
      *
-     * @param Illuminate\Http\Request $request
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
      * @param  string  $roleName
      * @return string
      */
-    public function roleIdByName($request, $roleName)
+    public function roleIdByName($jsessionid, $xBonitaAPIToken, $roleName)
     {
-        $jsessionid = $request->cookie('JSESSIONID');
-        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-
         $urlHelper = new URLHelper();
         $url = $urlHelper->getBonitaEndpointURL('/API/identity/role?p=0&f=name%3d' . $roleName);
 

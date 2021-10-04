@@ -132,8 +132,8 @@ class AuthController extends Controller
             $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
 
             $bonitaMembershipHelper = new BonitaMembershipHelper();
-            $apoderadoGroupId = $bonitaMembershipHelper->groupIdByName($request, "Apoderado");
-            $apoderadoRoleId = $bonitaMembershipHelper->roleIdByName($request, "apoderado");
+            $apoderadoGroupId = $bonitaMembershipHelper->groupIdByName($jsessionid, $xBonitaAPIToken, "Apoderado");
+            $apoderadoRoleId = $bonitaMembershipHelper->roleIdByName($jsessionid, $xBonitaAPIToken, "apoderado");
 
             /* Register Bonita User */
             $bonitaUserHelper = new BonitaUserHelper();
