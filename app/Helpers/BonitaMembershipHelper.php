@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use GuzzleHttp\Client as GuzzleClient;
 use App\Helpers\URLHelper;
+use App\Helpers\BonitaRequestHelper;
 
 
 class BonitaMembershipHelper
@@ -21,14 +22,11 @@ class BonitaMembershipHelper
         $urlHelper = new URLHelper();
         $url = $urlHelper->getBonitaEndpointURL('/API/identity/group?p=0&f=name%3d' . $groupName);
 
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-            'X-Bonita-API-Token' => $xBonitaAPIToken,
-        ];
+        $bonitaRequestHelper = new BonitaRequestHelper();
+        $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
         $client = new GuzzleClient([
-            'headers' => $headers
+            'headers' => $bonitaAuthHeaders
         ]);
 
         $response = $client->request('GET', $url);
@@ -50,14 +48,11 @@ class BonitaMembershipHelper
         $urlHelper = new URLHelper();
         $url = $urlHelper->getBonitaEndpointURL('/API/identity/role?p=0&f=name%3d' . $roleName);
 
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-            'X-Bonita-API-Token' => $xBonitaAPIToken,
-        ];
+        $bonitaRequestHelper = new BonitaRequestHelper();
+        $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
         $client = new GuzzleClient([
-            'headers' => $headers
+            'headers' => $bonitaAuthHeaders
         ]);
 
         $response = $client->request('GET', $url);
