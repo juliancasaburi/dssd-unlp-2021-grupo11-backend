@@ -12,11 +12,57 @@ use App\Models\User;
 use App\Helpers\BonitaMembershipHelper;
 use App\Helpers\BonitaUserHelper;
 use App\Http\Resources\User as UserResource;
+
 class AuthController extends Controller
 {
     /**
      * Get a JWT and cookie via given credentials.
      *
+     * @OA\Post(
+     * path="/api/auth/login",
+     * summary="Login",
+     * description="Login con email y password",
+     * operationId="authLogin",
+     * tags={"auth"},
+     *     @OA\RequestBody(
+     *       @OA\MediaType(
+     *           mediaType="multipart/form-data",
+     *           @OA\Schema(
+     *               type="object", 
+     *               @OA\Property(
+     *                  property="email",
+     *                  type="string",
+     *               ),
+     *               @OA\Property(
+     *                  property="password",
+     *                  type="string",
+     *               ),
+     *           ),
+     *       )
+     *     ),
+     * @OA\Response(
+     *    response=200,
+     *    description="Succesful login",
+     *    @OA\JsonContent(
+     *       example=""
+     *        )
+     *     ),
+     * @OA\Response(
+     *    response=401,
+     *    description="401 Unauthorized",
+     *    @OA\JsonContent(
+     *       example={"error":"Unauthorized"}
+     *    )
+     * ),
+     * @OA\Response(
+     *    response=500,
+     *    description="500 internal server error",
+     *    @OA\JsonContent(
+     *       example="500 internal server error"
+     *        )
+     * ),
+     * )
+     * 
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
