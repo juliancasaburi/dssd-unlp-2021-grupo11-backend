@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Client\ConnectionException;
 use App\Helpers\BonitaTaskHelper;
 use App\Models\SociedadAnonima;
+use App\Services\SociedadAnonimaService;
+use Illuminate\Support\Arr;
 
 class TaskController extends Controller
 {
@@ -75,6 +77,26 @@ class TaskController extends Controller
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
+    }
+
+    /**
+     * Obtener datos de una task + datos de la SociedadAnonima asociada
+     *
+     * @param int $taskId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTaskSociedadDataById(Request $request, SociedadAnonimaService $service, $taskId)
+    {
+        $jsessionid = $request->cookie('JSESSIONID');
+        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+        $bonitaTaskHelper = new BonitaTaskHelper();
+        $taskData = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
+        $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($taskData["caseId"]);
+        $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
+        return response()->json([
+            "task" => Arr::only($taskData, ['displayName', 'assigned_date', 'dueDate']),
+            "sociedadAnonima" => $sociedadAnonima
+        ], 200);
     }
 
     /**
