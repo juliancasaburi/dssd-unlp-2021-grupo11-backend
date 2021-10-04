@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Helpers\URLHelper;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use App\Helpers\BonitaRequestHelper;
 
 class UserSeeder extends Seeder
 {
@@ -30,14 +31,12 @@ class UserSeeder extends Seeder
 
         $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
         $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
-
+        $bonitaRequestHelper = new BonitaRequestHelper();
+        $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
         $apiIdentityUsersUrl = $urlHelper->getBonitaEndpointURL('/API/identity/user?p=0');
 
-        $users = Http::withHeaders([
-            'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-            'X-Bonita-API-Token' => $xBonitaAPIToken,
-        ])->get($apiIdentityUsersUrl);
-
+        $users = Http::withHeaders($bonitaAuthHeaders)->get($apiIdentityUsersUrl);
+        
         foreach (json_decode($users, true) as $user) {
             $role = '';
             if (Str::contains($user["userName"], 'admin')) {

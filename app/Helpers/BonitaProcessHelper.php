@@ -6,7 +6,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client as GuzzleClient;
 use App\Helpers\URLHelper;
-
+use App\Helpers\BonitaRequestHelper;
 
 class BonitaProcessHelper
 {
@@ -50,10 +50,10 @@ class BonitaProcessHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->put($url, [
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [
                 "type" => $type,
                 "value" => $value,
             ]);
@@ -84,11 +84,11 @@ class BonitaProcessHelper
 
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process/' . $processId . '/instantiation');
 
-            $headers = [
-                'Content-Type' => 'application/json',
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ];
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $headers = array_merge($bonitaAuthHeaders, [
+                'Content-Type' => 'application/json'
+            ]);
 
             $client = new GuzzleClient([
                 'headers' => $headers

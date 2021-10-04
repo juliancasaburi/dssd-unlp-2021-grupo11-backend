@@ -5,7 +5,7 @@ namespace App\Helpers;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use App\Helpers\URLHelper;
-
+use App\Helpers\BonitaRequestHelper;
 
 class BonitaUserHelper
 {
@@ -23,13 +23,15 @@ class BonitaUserHelper
             $urlHelper = new URLHelper();
             $bonitaRegisterUserUrl = $urlHelper->getBonitaEndpointURL("/API/identity/user");
 
-            /* Register Bonita User */
-            $bonitaRegisterResponse = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
                 'Content-Type' => 'application/json'
-            ])->post($bonitaRegisterUserUrl, [
+            ]);
+
+            /* Register Bonita User */
+            $bonitaRegisterResponse = Http::withHeaders($headers)->post($bonitaRegisterUserUrl, [
                 "userName" => $userData["email"],
                 "email" => $userData["email"],
                 "password" => $userData["password"],
@@ -61,13 +63,15 @@ class BonitaUserHelper
             $urlHelper = new URLHelper();
             $bonitaSetUserMembershipUrl = $urlHelper->getBonitaEndpointURL("/API/identity/membership");
 
-            /* Register Bonita User */
-            $bonitaSetUserMembershipResponse = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
                 'Content-Type' => 'application/json'
-            ])->post($bonitaSetUserMembershipUrl, [
+            ]);
+
+            /* Register Bonita User */
+            $bonitaSetUserMembershipResponse = Http::withHeaders($headers)->post($bonitaSetUserMembershipUrl, [
                 "user_id" => $data["user_id"],
                 "group_id" => $data["group_id"],
                 "role_id" => $data["role_id"],
@@ -93,12 +97,15 @@ class BonitaUserHelper
         try {
             $urlHelper = new URLHelper();
             $bonitaEnableUserUrl = $urlHelper->getBonitaEndpointURL("/API/identity/user/{$bonitaUserId}");
-            $bonitaEnableUserResponse = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
+
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
                 'Content-Type' => 'application/json'
-            ])->put($bonitaEnableUserUrl, [
+            ]);
+            
+            $bonitaEnableUserResponse = Http::withHeaders($headers)->put($bonitaEnableUserUrl, [
                 "enabled" => "true",
             ]);
 
