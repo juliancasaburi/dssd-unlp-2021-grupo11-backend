@@ -67,8 +67,6 @@ class BonitaProcessHelper
     /**
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
-     *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $name
      * @return \Illuminate\Http\JsonResponse
      */
