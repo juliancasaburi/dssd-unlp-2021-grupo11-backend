@@ -19,48 +19,48 @@ class AuthController extends Controller
      * Get a JWT and cookie via given credentials.
      *
      * @OA\Post(
-     * path="/api/auth/login",
-     * summary="Login",
-     * description="Login con email y password",
-     * operationId="authLogin",
-     * tags={"auth"},
-     *     @OA\RequestBody(
+     *    path="/api/auth/login",
+     *    summary="Login",
+     *    description="Login con email y password",
+     *    operationId="authLogin",
+     *    tags={"auth"},
+     *    @OA\RequestBody(
      *       @OA\MediaType(
-     *           mediaType="multipart/form-data",
-     *           @OA\Schema(
-     *               type="object", 
-     *               @OA\Property(
-     *                  property="email",
-     *                  type="string",
-     *               ),
-     *               @OA\Property(
-     *                  property="password",
-     *                  type="string",
-     *               ),
-     *           ),
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *             type="object", 
+     *             @OA\Property(
+     *                property="email",
+     *                type="string",
+     *             ),
+     *             @OA\Property(
+     *                property="password",
+     *                type="string",
+     *             ),
+     *          ),
+     *      )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Succesful login",
+     *       @OA\JsonContent(
+     *          example=""
      *       )
-     *     ),
-     * @OA\Response(
-     *    response=200,
-     *    description="Succesful login",
-     *    @OA\JsonContent(
-     *       example=""
-     *        )
-     *     ),
-     * @OA\Response(
-     *    response=401,
-     *    description="401 Unauthorized",
-     *    @OA\JsonContent(
-     *       example={"error":"Unauthorized"}
-     *    )
-     * ),
-     * @OA\Response(
-     *    response=500,
-     *    description="500 internal server error",
-     *    @OA\JsonContent(
-     *       example="500 internal server error"
-     *        )
-     * ),
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="401 Unauthorized",
+     *       @OA\JsonContent(
+     *          example={"error":"Unauthorized"}
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
      * )
      * 
      * @param  \Illuminate\Http\Request $request
@@ -97,10 +97,25 @@ class AuthController extends Controller
     /**
      * Log the user out (Invalidate the token).
      *
-     * @param  \Illuminate\Http\Request $request
+     * @OA\Post(
+     *    path="/api/auth/logout",
+     *    summary="Login",
+     *    description="Logout",
+     *    operationId="authLogout",
+     *    tags={"auth"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Response(
+     *       response=200,
+     *       description="Success"
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     * )
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout(Request $request)
+    public function logout()
     {
         try {
             $urlHelper = new URLHelper();
