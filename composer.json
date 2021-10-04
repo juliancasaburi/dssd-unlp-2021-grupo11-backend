@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "darkaonline/l5-swagger": "^8.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -17,10 +18,10 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.2",
         "livewire/livewire": "^2.4",
+        "masbug/flysystem-google-drive-ext": "^1.0",
         "spatie/laravel-permission": "^4.0",
         "tymon/jwt-auth": "^1.0",
-        "wildside/userstamps": "^2.1",
-        "masbug/flysystem-google-drive-ext": "^1.0"
+        "wildside/userstamps": "^2.1"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
