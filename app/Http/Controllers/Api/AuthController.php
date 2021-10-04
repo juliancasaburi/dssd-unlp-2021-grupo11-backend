@@ -113,6 +113,7 @@ class AuthController extends Controller
      *       description="Unauthorized"
      *    ),
      * )
+     * 
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout()
@@ -162,6 +163,59 @@ class AuthController extends Controller
 
     /** Register a User
      *
+     * @OA\Post(
+     *    path="/api/auth/register",
+     *    summary="Register",
+     *    description="Register con name, email, password y password_confirmation",
+     *    operationId="authLogin",
+     *    tags={"auth"},
+     *    @OA\RequestBody(
+     *       @OA\MediaType(
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *             type="object", 
+     *             @OA\Property(
+     *                property="name",
+     *                type="string",
+     *             ),
+     *              @OA\Property(
+     *                property="email",
+     *                type="string",
+     *             ),
+     *             @OA\Property(
+     *                property="password",
+     *                type="string",
+     *             ),
+     *              @OA\Property(
+     *                property="password_confirmation",
+     *                type="string",
+     *             ),
+     *          ),
+     *      )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Succesful register",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=400,
+     *       description="400 Bad Request",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * )
+     * 
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */

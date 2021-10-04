@@ -16,6 +16,33 @@ class SociedadAnonimaController extends Controller
     /**
      * Obtener las sociedad anónimas registradas por el usuario actual.
      *
+     * @OA\Get(
+     *    path="/api/sociedadesAnonimas",
+     *    summary="Sociedades anonimas",
+     *    description="Sociedades anonimas del usuario logueado",
+     *    operationId="getUserSociedadesAnonimas",
+     *    tags={"sociedadAnonima-user"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Response(
+     *       response=200,
+     *       description="JSON con datos de la S.A.",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * )
+     * 
      * @return \Illuminate\Http\JsonResponse
      */
     public function getUserSociedadesAnonimas(SociedadAnonimaService $service)
@@ -26,6 +53,41 @@ class SociedadAnonimaController extends Controller
     /**
      * Obtener la sociedad anónima con bonitaCaseId.
      *
+     * @OA\Get(
+     *    path="/api/sociedadAnonimaByCaseId/{id}",
+     *    summary="Sociedad anonima",
+     *    description="Sociedades anonima por caseId de Bonita",
+     *    operationId="getSociedadAnonimaByCaseId",
+     *    tags={"sociedadAnonima-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *         name="bonitaCaseId",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="JSON con datos de la S.A.",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param int $bonitaCaseId
      * @return \Illuminate\Http\JsonResponse
      */
