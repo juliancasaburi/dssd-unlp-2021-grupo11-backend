@@ -13,6 +13,8 @@ class BonitaTaskHelper
     /**
      * Obtener tareas para el caso con id.
      *
+     * @param  string $jsessionid
+     * @param  string $xBonitaAPIToken
      * @param  string  $bonitaCaseId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -35,6 +37,7 @@ class BonitaTaskHelper
 
     /**
      * Obtener datos de la tarea con id.
+     * 
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  int $taskId
@@ -59,6 +62,7 @@ class BonitaTaskHelper
 
     /**
      * Obtener datos de la tarea aplicando filtros.
+     * 
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  string $filter
@@ -83,6 +87,7 @@ class BonitaTaskHelper
 
     /**
      * Obtener datos de la próxima tarea a realizar por el usuario autenticado.
+     * 
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  Illuminate\Support\Collection $userRoles
@@ -111,6 +116,7 @@ class BonitaTaskHelper
 
     /**
      * Obtener las tareas disponibles para el usuario autenticado.
+     * 
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  Illuminate\Support\Collection $userRoles
@@ -139,6 +145,7 @@ class BonitaTaskHelper
 
     /**
      * Obtener las tareas tomadas por el usuario con id.
+     * 
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  int $bonitaUserId
@@ -193,7 +200,6 @@ class BonitaTaskHelper
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  string $taskId
-     * @param  array $dataArray
      * @param bool $assign
      * @return \Illuminate\Http\JsonResponse
      */
@@ -241,6 +247,7 @@ class BonitaTaskHelper
 
     /**
      * Liberar tarea con id por parte del usuario autenticado.
+     * 
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  int $taskId
