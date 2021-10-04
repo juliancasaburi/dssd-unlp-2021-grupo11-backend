@@ -5,8 +5,7 @@ namespace App\Helpers;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use App\Helpers\URLHelper;
-use App\Helpers\BonitaProcessHelper;
-
+use App\Helpers\BonitaRequestHelper;
 
 class BonitaTaskHelper
 {
@@ -24,10 +23,10 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/task?p=0&c=10&f=caseId=' . $bonitaCaseId);
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -49,10 +48,10 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -74,10 +73,10 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?{$filter}");
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -103,10 +102,10 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&c=1&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -132,10 +131,10 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -157,10 +156,10 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=assigned_id={$bonitaUserId}&f=state=ready");
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($url);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -183,10 +182,10 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->put($url, [$dataArray]);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [$dataArray]);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -209,14 +208,13 @@ class BonitaTaskHelper
             $urlHelper = new URLHelper();
             $url = $urlHelper->getBonitaEndpointURL('/API/bpm/userTask/' . $taskId . '/execution');
 
-            if($assign == true)
+            if ($assign == true)
                 $url = $url . '?assign=true';
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-                'X-Bonita-API-Token' => $xBonitaAPIToken,
-                'Content-Type' => 'application/json',
-            ])->withBody(null, 'application/json')->post($url);
+            $bonitaRequestHelper = new BonitaRequestHelper();
+            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+
+            $response = Http::withHeaders($bonitaAuthHeaders)->withBody(null, 'application/json')->post($url);
 
             return $response->json();
         } catch (ConnectionException $e) {
@@ -251,16 +249,15 @@ class BonitaTaskHelper
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
      * @param  int $taskId
-     * @param  int $bonitaUserId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function unassignTask($jsessionid, $xBonitaAPIToken, $taskId, $bonitaUserId)
+    public function unassignTask($jsessionid, $xBonitaAPIToken, $taskId)
     {
         try {
             $updateTaskDataArray = [
-                "assigned_id" => $bonitaUserId,
+                "assigned_id" => "",
             ];
-            
+
             $this->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);

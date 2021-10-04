@@ -124,7 +124,7 @@ class TaskController extends Controller
                 return response()->json("No estás asginado a la tarea. No puedes liberarla.", 403); 
 
             $bonitaTaskHelper = new BonitaTaskHelper();
-            $response = $bonitaTaskHelper->unassignTask($jsessionid, $xBonitaAPIToken, $taskId, "");
+            $response = $bonitaTaskHelper->unassignTask($jsessionid, $xBonitaAPIToken, $taskId);
 
             return response()->json("Tarea liberada", 200);
         } catch (ConnectionException $e) {
