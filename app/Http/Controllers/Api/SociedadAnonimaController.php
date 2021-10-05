@@ -133,6 +133,13 @@ class SociedadAnonimaController extends Controller
      *       description="Unauthorized"
      *    ),
      *    @OA\Response(
+     *       response=403,
+     *       description="No tienes acceso a los datos de esta sociedad.",
+     *       @OA\JsonContent(
+     *          example="No tienes acceso a los datos de esta sociedad."
+     *       )
+     *    ),
+     *    @OA\Response(
      *       response=500,
      *       description="500 internal server error",
      *       @OA\JsonContent(
@@ -141,11 +148,20 @@ class SociedadAnonimaController extends Controller
      *    ),
      * ) 
      * 
+     * @param \Illuminate\Http\Request $request
      * @param int $bonitaCaseId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getSociedadAnonimaByCaseId(SociedadAnonimaService $service, $bonitaCaseId)
+    public function getSociedadAnonimaByCaseId(Request $request, SociedadAnonimaService $service, $bonitaCaseId)
     {
+        $jsessionid = $request->cookie('JSESSIONID');
+        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+        $bonitaTaskHelper = new BonitaTaskHelper();
+        $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+        $taskData = head($userTasksResponse);
+        if ($taskData["assigned_id"] != auth()->user()->bonita_user_id)
+            return response()->json("No tienes acceso a los datos de esta sociedad.", 403);
+
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($bonitaCaseId);
         $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
         return response()->json($sociedadAnonima, 200);

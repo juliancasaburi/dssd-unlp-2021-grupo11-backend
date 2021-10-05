@@ -163,6 +163,13 @@ class TaskController extends Controller
      *       description="Unauthorized"
      *    ),
      *    @OA\Response(
+     *       response=403,
+     *       description="No tienes acceso a los datos de esta tarea.",
+     *       @OA\JsonContent(
+     *          example="No tienes acceso a los datos de esta tarea."
+     *       )
+     *    ),
+     *    @OA\Response(
      *       response=500,
      *       description="500 internal server error",
      *       @OA\JsonContent(
@@ -180,6 +187,9 @@ class TaskController extends Controller
         $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
         $bonitaTaskHelper = new BonitaTaskHelper();
         $taskData = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
+        if ($taskData["assigned_id"] != auth()->user()->bonita_user_id)
+            return response()->json("No tienes acceso a los datos de esta tarea.", 403);
+
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($taskData["caseId"]);
         $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
         return response()->json([
@@ -216,6 +226,13 @@ class TaskController extends Controller
      *    @OA\Response(
      *       response=401,
      *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=403,
+     *       description="La tarea ya se encuentra asignada. Primero debe ser liberada.",
+     *       @OA\JsonContent(
+     *          example="La tarea ya se encuentra asignada. Primero debe ser liberada."
+     *       )
      *    ),
      *    @OA\Response(
      *       response=500,
@@ -278,6 +295,13 @@ class TaskController extends Controller
      *    @OA\Response(
      *       response=401,
      *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=403,
+     *       description="No estás asginado a la tarea. No puedes liberarla.",
+     *       @OA\JsonContent(
+     *          example="No estás asginado a la tarea. No puedes liberarla."
+     *       )
      *    ),
      *    @OA\Response(
      *       response=500,
