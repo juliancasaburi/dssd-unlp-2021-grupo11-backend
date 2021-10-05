@@ -40,6 +40,33 @@ class TaskController extends Controller
     /**
      * Tareas disponibles para el usuario autenticado.
      *
+     * @OA\Get(
+     *    path="/api/availableEmployeeTasks",
+     *    summary="Tareas disponibles para el empleado autenticado",
+     *    description="Tareas disponibles para el empleado autenticado",
+     *    operationId="availableTasks",
+     *    tags={"tareas-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Response(
+     *       response=200,
+     *       description="JSON con tareas disponibles, listas para asignar",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -61,6 +88,33 @@ class TaskController extends Controller
     /**
      * Tareas tomadas por el usuario autenticado.
      *
+     * @OA\Get(
+     *    path="/api/employeeTasks/",
+     *    summary="Tareas asignadas al empleado autenticado",
+     *    description="Tareas asignadas al empleado autenticado",
+     *    operationId="userTasks",
+     *    tags={"tareas-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Response(
+     *       response=200,
+     *       description="JSON con tareas asignadas al empleado autenticado",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -82,6 +136,41 @@ class TaskController extends Controller
     /**
      * Obtener datos de una task + datos de la SociedadAnonima asociada
      *
+     * @OA\Get(
+     *    path="/api/employeeTask/{taskId}",
+     *    summary="Tarea con id {taskId} y datos de la S.A. asociada",
+     *    description="Tarea con id {taskId} y datos de la S.A. asociada",
+     *    operationId="getTaskSociedadDataById",
+     *    tags={"tareas-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *       name="taskId",
+     *       in="path",
+     *       required=true,
+     *       @OA\Schema(
+     *         type="string"
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="JSON con tarea + datos S.A.",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param int $taskId
      * @return \Illuminate\Http\JsonResponse
      */
@@ -102,6 +191,41 @@ class TaskController extends Controller
     /**
      * Asignar tarea con id al usuario autenticado.
      *
+     * @OA\Post(
+     *    path="/api/assignTask/{taskId}",
+     *    summary="Asignar tarea con id {taskId} al empleado autenticado",
+     *    description="Asignar tarea con id {taskId} al empleado autenticado",
+     *    operationId="assignTask",
+     *    tags={"tareas-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *       name="taskId",
+     *       in="path",
+     *       required=true,
+     *       @OA\Schema(
+     *         type="string"
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Tarea asignada",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param  \Illuminate\Http\Request $request
      * @param int $taskId
      * @return \Illuminate\Http\JsonResponse
@@ -129,6 +253,41 @@ class TaskController extends Controller
     /**
      * Liberar tarea con id por parte del usuario autenticado.
      *
+     * @OA\Post(
+     *    path="/api/unassignTask/{taskId}",
+     *    summary="Liberar tarea con id {taskId}, que estaba asignada al usuario autenticado",
+     *    description="Liberar tarea con id {taskId}, que estaba asignada al usuario autenticado",
+     *    operationId="unassignTask",
+     *    tags={"tareas-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *       name="taskId",
+     *       in="path",
+     *       required=true,
+     *       @OA\Schema(
+     *         type="string"
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Tarea liberada",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param  \Illuminate\Http\Request $request
      * @param int $taskId
      * @return \Illuminate\Http\JsonResponse
