@@ -252,6 +252,48 @@ class SociedadAnonimaController extends Controller
 
     /**
      * Corregir una SociedadAnonima rechazada por mesa de entradas.
+     * 
+     * @OA\Patch(
+     *    path="/api/sociedadAnonima/{id}",
+     *    summary="Corregir Sociedad Anonima rechazada por mesa de entradas",
+     *    description="Corregir Sociedad Anonima rechazada por mesa de entradas",
+     *    operationId="patchSociedadAnonima",
+     *    tags={"sociedadAnonima-apoderado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="S.A. actualizada",
+     *       @OA\JsonContent(
+     *          example="S.A. actualizada"
+     *       )
+     *    ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=403,
+     *       description="No puedes corregir esta S.A.",
+     *       @OA\JsonContent(
+     *          example="No puedes corregir esta S.A."
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
      *
      * @param  \Illuminate\Http\Request $request
      * @param  \Illuminate\Http\Request $idSociedad
@@ -262,7 +304,7 @@ class SociedadAnonimaController extends Controller
         try {
             $sociedadAnonima = SociedadAnonima::find($idSociedad);
 
-            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por empleado-mesa-de-entradas')
+            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por empleado-mesa-de-entradas' or $sociedadAnonima->created_by != auth()->user()->id)
                 return response()->json("No puedes corregir esta S.A.", 403);
 
             $sociedadAnonimaValidator = Validator::make($request->all(), [
@@ -374,7 +416,7 @@ class SociedadAnonimaController extends Controller
         try {
             $sociedadAnonima = SociedadAnonima::find($idSociedad);
 
-            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por escribano-area-legales')
+            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por escribano-area-legales' or $sociedadAnonima->created_by != auth()->user()->id)
                 return response()->json("No puedes modificar el estatuto de esta S.A.", 403);
 
             $validator = Validator::make($request->all(), [
@@ -406,6 +448,33 @@ class SociedadAnonimaController extends Controller
     /**
      * Registrar la sociedad anonima.
      *
+     * @OA\Put(
+     *    path="/api/sociedadAnonima",
+     *    summary="Solicitar la creación de una Sociedad Anonima",
+     *    description="Solicitar la creación de una Sociedad Anonima",
+     *    operationId="register",
+     *    tags={"sociedadAnonima-apoderado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Response(
+     *       response=200,
+     *       description="Solicitud creada",
+     *       @OA\JsonContent(
+     *          example="Solicitud creada"
+     *       )
+     *    ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */

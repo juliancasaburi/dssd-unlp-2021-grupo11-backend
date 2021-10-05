@@ -235,6 +235,61 @@
                         "apiAuth": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "sociedadAnonima-apoderado"
+                ],
+                "summary": "Corregir Sociedad Anonima rechazada por mesa de entradas",
+                "description": "Corregir Sociedad Anonima rechazada por mesa de entradas",
+                "operationId": "patchSociedadAnonima",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "S.A. actualizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "S.A. actualizada"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "No puedes corregir esta S.A.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "No puedes corregir esta S.A."
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "500 internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "500 internal server error"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
             }
         },
         "/api/sociedadAnonimaByCaseId/{id}": {
@@ -399,6 +454,44 @@
                                 "example": "No puedes modificar el estatuto de esta S.A."
                             }
                         }
+                    },
+                    "500": {
+                        "description": "500 internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "500 internal server error"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/sociedadAnonima": {
+            "put": {
+                "tags": [
+                    "sociedadAnonima-apoderado"
+                ],
+                "summary": "Solicitar la creación de una Sociedad Anonima",
+                "description": "Solicitar la creación de una Sociedad Anonima",
+                "operationId": "register",
+                "responses": {
+                    "200": {
+                        "description": "Solicitud creada",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "Solicitud creada"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "500": {
                         "description": "500 internal server error",
