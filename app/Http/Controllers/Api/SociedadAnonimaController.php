@@ -21,7 +21,7 @@ class SociedadAnonimaController extends Controller
      *    summary="Sociedades anonimas",
      *    description="Sociedades anonimas del usuario logueado",
      *    operationId="getUserSociedadesAnonimas",
-     *    tags={"sociedadAnonima-user"},
+     *    tags={"sociedadAnonima-apoderado"},
      *    security={{ "apiAuth": {} }},
      *    @OA\Response(
      *       response=200,
@@ -101,6 +101,60 @@ class SociedadAnonimaController extends Controller
     /**
      * Aprobar/Rechazar.
      *
+     * @OA\Post(
+     *    path="/api/updateSociedadAnonimaStatus/{taskId}",
+     *    summary="Sociedad anonima",
+     *    description="Aprobar/Rechazar una tarea asignada, del empleado autenticado",
+     *    operationId="updateSociedadAnonimaStatus",
+     *    tags={"sociedadAnonima-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *         name="taskId",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\RequestBody(
+     *       @OA\MediaType(
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *             type="object", 
+     *             @OA\Property(
+     *                property="aprobado",
+     *                type="string"
+     *             ),
+     *          ),
+     *      )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Tarea aprobada/rechazada",
+     *       @OA\JsonContent(
+     *          example="Tarea aprobada/rechazada"
+     *       )
+     *    ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=403,
+     *       description="No puedes aprobar/rechazar esta tarea",
+     *       @OA\JsonContent(
+     *          example="No puedes aprobar/rechazar esta tarea."
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
      * @param  \Illuminate\Http\Request $request
      * @param int $taskId
      * @return \Illuminate\Http\JsonResponse
@@ -211,7 +265,53 @@ class SociedadAnonimaController extends Controller
 
     /**
      * Actualizar el estatuto.
-     *
+     * 
+     * @OA\Put(
+     *    path="/api/estatuto",
+     *    summary="Sociedad anonima",
+     *    description="Subir un nuevo archivo estatuto",
+     *    operationId="updateEstatuto",
+     *    tags={"sociedadAnonima-apoderado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\RequestBody(
+     *       @OA\MediaType(
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *             type="object", 
+     *             @OA\Property(
+     *                property="archivo_estatuto",
+     *                type="file"
+     *             ),
+     *          ),
+     *      )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Estatuto actualizado",
+     *       @OA\JsonContent(
+     *          example="Estatuto actualizado"
+     *       )
+     *    ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=403,
+     *       description="No puedes modificar el estatuto de esta S.A.",
+     *       @OA\JsonContent(
+     *          example="No puedes modificar el estatuto de esta S.A."
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * )
+     * 
      * @param  \Illuminate\Http\Request $request
      * @param  \Illuminate\Http\Request $idSociedad
      * @return \Illuminate\Http\JsonResponse
