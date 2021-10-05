@@ -51,6 +51,59 @@ class SociedadAnonimaController extends Controller
     }
 
     /**
+     * Obtener la sociedad anónima con id.
+     *
+     * @OA\Get(
+     *    path="/api/sociedadAnonima/{id}",
+     *    summary="Sociedad anónima",
+     *    description="Sociedad anonima con id",
+     *    operationId="getUserSociedadAnonima",
+     *    tags={"sociedadAnonima-apoderado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="JSON con datos de la S.A.",
+     *       @OA\JsonContent(
+     *          example=""
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=403,
+     *       description="Forbidden"
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * )
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserSociedadAnonima(SociedadAnonimaService $service, $id)
+    {
+        $sociedadAnonima = $service->getSociedadAnonimaWithSociosById($id);
+        if($sociedadAnonima->created_by == (auth()->user()->id))
+            return response()->json($sociedadAnonima, 200);
+        else
+            return response()->json("Forbidden", 403);
+    }
+
+    /**
      * Obtener la sociedad anónima con bonitaCaseId.
      *
      * @OA\Get(
@@ -70,7 +123,7 @@ class SociedadAnonimaController extends Controller
      *    ),
      *    @OA\Response(
      *       response=200,
-     *       description="JSON con datos de la S.A.",
+     *       description="JSON con datos de las S.A.",
      *       @OA\JsonContent(
      *          example=""
      *       )

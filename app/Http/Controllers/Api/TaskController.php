@@ -301,7 +301,7 @@ class TaskController extends Controller
             $bonitaTaskHelper = new BonitaTaskHelper();
             $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
-            if (!$response["assigned_id"] == auth()->user()->bonita_user_id)
+            if ($response["assigned_id"] != auth()->user()->bonita_user_id)
                 return response()->json("No estás asginado a la tarea. No puedes liberarla.", 403); 
 
             $bonitaTaskHelper = new BonitaTaskHelper();
