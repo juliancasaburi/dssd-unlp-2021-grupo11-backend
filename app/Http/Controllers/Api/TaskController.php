@@ -187,11 +187,15 @@ class TaskController extends Controller
         $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
         $bonitaTaskHelper = new BonitaTaskHelper();
         $taskData = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
-        if ($taskData["assigned_id"] != auth()->user()->bonita_user_id)
+        $user = auth()->user();
+        if ($taskData["assigned_id"] != $user->bonita_user_id)
             return response()->json("No tienes acceso a los datos de esta tarea.", 403);
 
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($taskData["caseId"]);
-        $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
+
+        if ($user->getRoleNames()->first() == 'escribano-area-legales')
+            $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
+        
         return response()->json([
             "task" => Arr::only($taskData, ['displayName', 'assigned_date', 'dueDate']),
             "sociedadAnonima" => $sociedadAnonima
@@ -257,7 +261,7 @@ class TaskController extends Controller
             $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
             if ($response["assigned_id"] != 0)
-                return response()->json("La tarea ya se encuentra asignada. Primero debe ser liberada.", 403); 
+                return response()->json("La tarea ya se encuentra asignada. Primero debe ser liberada.", 403);
 
             $response = $bonitaTaskHelper->assignTask($jsessionid, $xBonitaAPIToken, $taskId, auth()->user()->bonita_user_id);
 
@@ -326,7 +330,7 @@ class TaskController extends Controller
             $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
             if ($response["assigned_id"] != auth()->user()->bonita_user_id)
-                return response()->json("No estás asginado a la tarea. No puedes liberarla.", 403); 
+                return response()->json("No estás asginado a la tarea. No puedes liberarla.", 403);
 
             $bonitaTaskHelper = new BonitaTaskHelper();
             $response = $bonitaTaskHelper->unassignTask($jsessionid, $xBonitaAPIToken, $taskId);
