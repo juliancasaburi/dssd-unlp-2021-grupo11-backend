@@ -323,6 +323,15 @@
                     "401": {
                         "description": "Unauthorized"
                     },
+                    "403": {
+                        "description": "No tienes acceso a los datos de esta sociedad.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "No tienes acceso a los datos de esta sociedad."
+                            }
+                        }
+                    },
                     "500": {
                         "description": "500 internal server error",
                         "content": {
@@ -617,6 +626,15 @@
                     "401": {
                         "description": "Unauthorized"
                     },
+                    "403": {
+                        "description": "No tienes acceso a los datos de esta tarea.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "No tienes acceso a los datos de esta tarea."
+                            }
+                        }
+                    },
                     "500": {
                         "description": "500 internal server error",
                         "content": {
@@ -665,6 +683,15 @@
                     "401": {
                         "description": "Unauthorized"
                     },
+                    "403": {
+                        "description": "La tarea ya se encuentra asignada. Primero debe ser liberada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "La tarea ya se encuentra asignada. Primero debe ser liberada."
+                            }
+                        }
+                    },
                     "500": {
                         "description": "500 internal server error",
                         "content": {
@@ -712,6 +739,15 @@
                     },
                     "401": {
                         "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "No estás asginado a la tarea. No puedes liberarla.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "No estás asginado a la tarea. No puedes liberarla."
+                            }
+                        }
                     },
                     "500": {
                         "description": "500 internal server error",
