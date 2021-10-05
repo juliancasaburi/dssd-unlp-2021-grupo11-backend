@@ -167,9 +167,9 @@ class SociedadAnonimaController extends Controller
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($bonitaCaseId);
 
         if ($user->getRoleNames()->first() == 'escribano-area-legales')
-            $sociedadAnonima["url_carpeta_estatuto"] = stripcslashes($service->getPrivateFolderUrl($sociedadAnonima->nombre));
+            $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
 
-        return response()->json($sociedadAnonima, 200);
+        return response()->json($sociedadAnonima, 200, [], JSON_UNESCAPED_SLASHES);
     }
 
     /**
