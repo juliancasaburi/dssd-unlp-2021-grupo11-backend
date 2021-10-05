@@ -186,6 +186,57 @@
                 ]
             }
         },
+        "/api/sociedadAnonima/{id}": {
+            "get": {
+                "tags": [
+                    "sociedadAnonima-apoderado"
+                ],
+                "summary": "Sociedad anónima",
+                "description": "Sociedad anonima con id",
+                "operationId": "getUserSociedadAnonima",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "JSON con datos de la S.A.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": ""
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "500": {
+                        "description": "500 internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": "500 internal server error"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
         "/api/sociedadAnonimaByCaseId/{id}": {
             "get": {
                 "tags": [
@@ -206,7 +257,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "JSON con datos de la S.A.",
+                        "description": "JSON con datos de las S.A.",
                         "content": {
                             "application/json": {
                                 "schema": {},
