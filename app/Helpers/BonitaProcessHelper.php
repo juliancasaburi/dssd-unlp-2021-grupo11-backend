@@ -67,10 +67,11 @@ class BonitaProcessHelper
     /**
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
-     * @param  string  $name
+     * @param  string $name
+     * @param  array  $caseData
      * @return \Illuminate\Http\JsonResponse
      */
-    public function startProcessByName($jsessionid, $xBonitaAPIToken, $name)
+    public function startProcessByName($jsessionid, $xBonitaAPIToken, $name, $caseData)
     {
         try {
             $urlHelper = new URLHelper();
@@ -81,24 +82,31 @@ class BonitaProcessHelper
             ])->get($url);
 
             $processId = head($response->json())['id'];
-
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process/' . $processId . '/instantiation');
+            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/case');
 
             $bonitaRequestHelper = new BonitaRequestHelper();
             $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
             $headers = array_merge($bonitaAuthHeaders, [
+                'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
             ]);
 
-            $client = new GuzzleClient([
-                'headers' => $headers
+            /* Register Bonita User */
+            $bonitaRegisterResponse = Http::withHeaders($headers)->post($url, [
+                "processDefinitionId" => $processId,
+                "variables" => [
+                    [
+                        "name" => "nombre_sociedad",
+                        "value" => $caseData['nombre_sociedad']
+                    ],
+                    [
+                        "name" => "email_apoderado",
+                        "value" => $caseData['email_apoderado']
+                    ]
+                    ],
             ]);
 
-            $response = $client->request('POST', $url);
-            $status = $response->getStatusCode();
-            $response_body = $response->getBody()->getContents();
-
-            return response()->json(json_decode($response_body), $status);
+            return response(json_decode($bonitaRegisterResponse->body(), true), $bonitaRegisterResponse->status());
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
