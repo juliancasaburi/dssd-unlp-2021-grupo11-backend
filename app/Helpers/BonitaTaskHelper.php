@@ -14,7 +14,7 @@ class BonitaTaskHelper
      *
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
-     * @param  string  $bonitaCaseId
+     * @param  int  $bonitaCaseId
      * @return \Illuminate\Http\JsonResponse
      */
     public function tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId)
