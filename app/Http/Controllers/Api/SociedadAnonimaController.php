@@ -159,11 +159,16 @@ class SociedadAnonimaController extends Controller
         $bonitaTaskHelper = new BonitaTaskHelper();
         $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
         $taskData = head($userTasksResponse);
-        if ($taskData["assigned_id"] != auth()->user()->bonita_user_id)
+        
+        $user = auth()->user();
+        if ($taskData["assigned_id"] != $user->bonita_user_id)
             return response()->json("No tienes acceso a los datos de esta sociedad.", 403);
 
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($bonitaCaseId);
-        $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
+
+        if ($user->getRoleNames()->first() == 'escribano-area-legales')
+            $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
+
         return response()->json($sociedadAnonima, 200);
     }
 
