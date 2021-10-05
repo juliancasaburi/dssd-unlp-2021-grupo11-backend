@@ -194,7 +194,7 @@ class TaskController extends Controller
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($taskData["caseId"]);
 
         if ($user->getRoleNames()->first() == 'escribano-area-legales')
-            $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
+            $sociedadAnonima["url_carpeta_estatuto"] = stripcslashes($service->getPrivateFolderUrl($sociedadAnonima->nombre));
         
         return response()->json([
             "task" => Arr::only($taskData, ['displayName', 'assigned_date', 'dueDate']),
