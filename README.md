@@ -1,6 +1,6 @@
 # dssd-unlp-2021-grupo11-backend
 
-## Comenzando 🚀
+# Comenzando 🚀
 
 _Sigue las siguientes instrucciones para clonar este repositorio en tu máquina local_
 
@@ -106,3 +106,8 @@ sudo docker-compose up -d nginx postgres redis pgadmin workspace
 
 ## Accediendo a la api
 La api puede accederse en http://localhost:80
+
+# Endpoints - Documentación
+La documentación generada por OpenAPI/Swagger, puede ser accedida en http://localhost:80/api/docs
+
+> Nota: el listado de endpoints está completo, pero la funcionalidad try it out de los mismos aún no está completa para realizar pruebas.
