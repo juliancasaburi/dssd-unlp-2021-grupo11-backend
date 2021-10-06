@@ -92,15 +92,17 @@ class SociedadAnonimaController extends Controller
      *    ),
      * )
      * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getUserSociedadAnonima(SociedadAnonimaService $service, $id)
+    public function getUserSociedadAnonima(Request $request, $id, SociedadAnonimaService $service)
     {
         $sociedadAnonima = $service->getSociedadAnonimaWithSociosById($id);
-        if($sociedadAnonima->created_by == (auth()->user()->id))
-            return response()->json($sociedadAnonima, 200);
-        else
+        if ($request->user()->cannot('view', $sociedadAnonima))
             return response()->json("Forbidden", 403);
+        else
+            return response()->json($sociedadAnonima, 200);
     }
 
     /**
@@ -157,9 +159,8 @@ class SociedadAnonimaController extends Controller
         $jsessionid = $request->cookie('JSESSIONID');
         $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
         $bonitaTaskHelper = new BonitaTaskHelper();
-        $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-        $taskData = head($userTasksResponse);
-        
+        $taskData = head($bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId));
+
         $user = auth()->user();
         if ($taskData["assigned_id"] != $user->bonita_user_id)
             return response()->json("No tienes acceso a los datos de esta sociedad.", 403);
@@ -325,7 +326,7 @@ class SociedadAnonimaController extends Controller
         try {
             $sociedadAnonima = SociedadAnonima::find($idSociedad);
 
-            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por empleado-mesa-de-entradas' or $sociedadAnonima->created_by != auth()->user()->id)
+            if ($request->user()->cannot('patch', $sociedadAnonima))
                 return response()->json("No puedes corregir esta S.A.", 403);
 
             $sociedadAnonimaValidator = Validator::make($request->all(), [
@@ -445,7 +446,7 @@ class SociedadAnonimaController extends Controller
         try {
             $sociedadAnonima = SociedadAnonima::find($idSociedad);
 
-            if ($sociedadAnonima->estado_evaluacion != 'Rechazado por escribano-area-legales' or $sociedadAnonima->created_by != auth()->user()->id)
+            if ($request->user()->cannot('update', $sociedadAnonima))
                 return response()->json("No puedes modificar el estatuto de esta S.A.", 403);
 
             $validator = Validator::make($request->all(), [
@@ -549,7 +550,7 @@ class SociedadAnonimaController extends Controller
             /* Se marca la primera actividad como completada */
             $bonitaTaskHelper = new BonitaTaskHelper();
             $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-            while(empty($userTasksResponse))
+            while (empty($userTasksResponse))
                 $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
             $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Pendiente mesa de entradas");
