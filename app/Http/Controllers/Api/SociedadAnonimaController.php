@@ -383,7 +383,7 @@ class SociedadAnonimaController extends Controller
      * Actualizar el estatuto.
      * 
      * @OA\Put(
-     *    path="/api/estatuto/{idSociedad}",
+     *    path="/api/sociedadAnonima/{idSociedad}/estatuto",
      *    summary="Subir un nuevo archivo estatuto para la Sociedad anonima con id",
      *    description="Subir un nuevo archivo estatuto",
      *    operationId="updateEstatuto",
@@ -440,7 +440,7 @@ class SociedadAnonimaController extends Controller
      * @param  \Illuminate\Http\Request $idSociedad
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateEstatuto(SociedadAnonimaService $service, Request $request, $idSociedad)
+    public function updateEstatuto(Request $request, $idSociedad, SociedadAnonimaService $service)
     {
         try {
             $sociedadAnonima = SociedadAnonima::find($idSociedad);
