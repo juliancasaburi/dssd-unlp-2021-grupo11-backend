@@ -421,7 +421,7 @@
             }
         },
         "/api/sociedadAnonima/{idSociedad}/estatuto": {
-            "put": {
+            "post": {
                 "tags": [
                     "sociedadAnonima-apoderado"
                 ],

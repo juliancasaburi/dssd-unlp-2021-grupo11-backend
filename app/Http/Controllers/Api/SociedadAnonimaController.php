@@ -383,7 +383,7 @@ class SociedadAnonimaController extends Controller
     /**
      * Actualizar el estatuto.
      * 
-     * @OA\Put(
+     * @OA\Post(
      *    path="/api/sociedadAnonima/{idSociedad}/estatuto",
      *    summary="Subir un nuevo archivo estatuto para la Sociedad anonima con id",
      *    description="Subir un nuevo archivo estatuto",
