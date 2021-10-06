@@ -492,7 +492,7 @@
             }
         },
         "/api/sociedadAnonima": {
-            "put": {
+            "post": {
                 "tags": [
                     "sociedadAnonima-apoderado"
                 ],

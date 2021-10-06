@@ -477,7 +477,7 @@ class SociedadAnonimaController extends Controller
     /**
      * Registrar la sociedad anonima.
      *
-     * @OA\Put(
+     * @OA\Post(
      *    path="/api/sociedadAnonima",
      *    summary="Solicitar la creación de una Sociedad Anonima",
      *    description="Solicitar la creación de una Sociedad Anonima",
