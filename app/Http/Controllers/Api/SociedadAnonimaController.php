@@ -383,8 +383,8 @@ class SociedadAnonimaController extends Controller
      * Actualizar el estatuto.
      * 
      * @OA\Put(
-     *    path="/api/estatuto",
-     *    summary="Sociedad anonima",
+     *    path="/api/estatuto/{idSociedad}",
+     *    summary="Subir un nuevo archivo estatuto para la Sociedad anonima con id",
      *    description="Subir un nuevo archivo estatuto",
      *    operationId="updateEstatuto",
      *    tags={"sociedadAnonima-apoderado"},
@@ -400,6 +400,14 @@ class SociedadAnonimaController extends Controller
      *             ),
      *          ),
      *      )
+     *    ),
+     *    @OA\Parameter(
+     *         name="idSociedad",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
      *    ),
      *    @OA\Response(
      *       response=200,
