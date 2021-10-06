@@ -441,7 +441,7 @@ class SociedadAnonimaController extends Controller
      * @param  \Illuminate\Http\Request $idSociedad
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateEstatuto(Request $request, $idSociedad, SociedadAnonimaService $service)
+    public function updateEstatuto(SociedadAnonimaService $service, Request $request, $idSociedad)
     {
         try {
             $sociedadAnonima = SociedadAnonima::find($idSociedad);
@@ -450,7 +450,7 @@ class SociedadAnonimaController extends Controller
                 return response()->json("No puedes modificar el estatuto de esta S.A.", 403);
 
             $validator = Validator::make($request->all(), [
-                'archivo_estatuto' => 'mimes:docx,odt,pdf'
+                'archivo_estatuto' => 'required|mimes:docx,odt,pdf'
             ]);
 
             if ($validator->fails()) {
@@ -459,7 +459,7 @@ class SociedadAnonimaController extends Controller
 
             $service->updateEstatuto(
                 $request->file('archivo_estatuto'),
-                $idSociedad,
+                $sociedadAnonima->nombre,
             );
 
             /* Se marca la actividad como completada */
@@ -518,7 +518,7 @@ class SociedadAnonimaController extends Controller
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
-                'archivo_estatuto' => 'mimes:docx,odt,pdf'
+                'archivo_estatuto' => 'required|mimes:docx,odt,pdf'
             ]);
 
             $sociosArray = json_decode($request->input('socios'), true);

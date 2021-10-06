@@ -39,7 +39,7 @@ Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute', 'apoderadoOnlyR
     Route::get('sociedadAnonima/{id}', [SociedadAnonimaController::class, 'getUserSociedadAnonima']);
     Route::post('sociedadAnonima', [SociedadAnonimaController::class, 'register']);
     Route::patch('sociedadAnonima/{id}', [SociedadAnonimaController::class, 'patchSociedadAnonima']);
-    Route::put('sociedadAnonima/{idSociedad}/estatuto', [SociedadAnonimaController::class, 'updateEstatuto']);
+    Route::post('sociedadAnonima/{idSociedad}/estatuto', [SociedadAnonimaController::class, 'updateEstatuto']);
 });
 
 /* Employee, JWT & Bonita token protected routes */
