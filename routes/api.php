@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ProcessController;
 use App\Http\Controllers\Api\SociedadAnonimaController;
 use App\Http\Controllers\Api\TaskController;
 
@@ -40,7 +39,7 @@ Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute', 'apoderadoOnlyR
     Route::get('sociedadAnonima/{id}', [SociedadAnonimaController::class, 'getUserSociedadAnonima']);
     Route::post('sociedadAnonima', [SociedadAnonimaController::class, 'register']);
     Route::patch('sociedadAnonima/{id}', [SociedadAnonimaController::class, 'patchSociedadAnonima']);
-    Route::put('estatuto', [SociedadAnonimaController::class, 'updateEstatuto']);
+    Route::put('estatuto/{idSociedad}', [SociedadAnonimaController::class, 'updateEstatuto']);
 });
 
 /* Employee, JWT & Bonita token protected routes */

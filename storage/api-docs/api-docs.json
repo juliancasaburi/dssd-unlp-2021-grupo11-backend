@@ -420,14 +420,24 @@
                 ]
             }
         },
-        "/api/estatuto": {
+        "/api/estatuto/{idSociedad}": {
             "put": {
                 "tags": [
                     "sociedadAnonima-apoderado"
                 ],
-                "summary": "Sociedad anonima",
+                "summary": "Subir un nuevo archivo estatuto para la Sociedad anonima con id",
                 "description": "Subir un nuevo archivo estatuto",
                 "operationId": "updateEstatuto",
+                "parameters": [
+                    {
+                        "name": "idSociedad",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "multipart/form-data": {
