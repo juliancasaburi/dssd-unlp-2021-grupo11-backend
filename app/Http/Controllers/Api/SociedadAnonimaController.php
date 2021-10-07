@@ -10,6 +10,7 @@ use App\Services\SociedadAnonimaService;
 use App\Helpers\BonitaTaskHelper;
 use App\Models\SociedadAnonima;
 use Illuminate\Validation\Rule;
+use App\Models\User;
 
 class SociedadAnonimaController extends Controller
 {
@@ -268,6 +269,15 @@ class SociedadAnonimaController extends Controller
         // Actualizar la SociedadAnonima
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
         $sociedadAnonima->save();
+
+        // Asignar tarea de modificación al apoderado
+        $bonitaUserId = User::find($sociedadAnonima->created_by)->bonita_user_id;
+        $updateTaskDataArray = [
+            "assigned_id" => $bonitaUserId,
+        ];
+        sleep(1);
+        $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+        $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], $updateTaskDataArray);
 
         return response()->json("Tarea aprobada/rechazada", 200);
     }
