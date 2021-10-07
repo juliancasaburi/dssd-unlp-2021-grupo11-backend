@@ -270,15 +270,6 @@ class SociedadAnonimaController extends Controller
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
         $sociedadAnonima->save();
 
-        // Asignar tarea de modificación al apoderado
-        $bonitaUserId = User::find($sociedadAnonima->created_by)->bonita_user_id;
-        $updateTaskDataArray = [
-            "assigned_id" => $bonitaUserId,
-        ];
-        sleep(1);
-        $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-        $bonitaTaskHelper->updateTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], $updateTaskDataArray);
-
         return response()->json("Tarea aprobada/rechazada", 200);
     }
 
@@ -476,8 +467,8 @@ class SociedadAnonimaController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
             $bonitaTaskHelper = new BonitaTaskHelper();
-            $userTasksResponse = $bonitaTaskHelper->userTasks($jsessionid, $xBonitaAPIToken, auth()->user()->bonita_user_id);
-            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], false);
+            $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $sociedadAnonima->bonita_case_id);
+            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], true);
 
             return response()->json("Estatuto actualizado", 200);
         } catch (\Exception $e) {
