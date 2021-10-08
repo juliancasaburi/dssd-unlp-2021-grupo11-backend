@@ -36,4 +36,14 @@ return [
         'admin_password' => env('BONITA_ADMIN_PASSWORD'),
     ],
 
+    'estampillado' => [
+        'endpoint' => env('ESTAMPILLADO_ENDPOINT'),
+    ],
+
+    'qr' => [
+        'api_host' => env('QR_API_HOST'),
+        'api_url' => env('QR_API_URL'),
+        'api_key' => env('QR_API_KEY'),
+    ],
+
 ];
