@@ -95,7 +95,7 @@ class SociedadAnonimaService
         $sociedadAnonima->save();
     }
 
-    public function storePaisesEstados(
+    public function storeEstados(
         SociedadAnonima $sociedadAnonima,
         array $paisesEstados
     ) {
