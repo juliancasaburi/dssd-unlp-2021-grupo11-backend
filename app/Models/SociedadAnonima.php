@@ -71,4 +71,12 @@ class SociedadAnonima extends Model
     {
         return Socio::find($this->apoderado_id);
     }
+
+    /**
+     * Obtener los estados a los que exporta.
+     */
+    public function estados()
+    {
+        return $this->belongsToMany(Estado::class, 'sociedades_anonimas_estados', 'estado_id', 'sociedad_anonima_id');
+    }
 }
