@@ -331,12 +331,18 @@ class SociedadAnonimaController extends Controller
                 return response()->json("No puedes corregir esta S.A.", 403);
 
             $sociedadAnonimaValidator = Validator::make($request->all(), [
-                'fecha_creacion' => 'required|date|',
+                'fecha_creacion' => 'required|date|before_or_equal:now',
                 'domicilio_legal' => 'required|string|between:2,100',
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
+                'paises_estados' => 'required|json',
             ]);
+
+            if ($sociedadAnonimaValidator->fails()) {
+                $errors = $sociedadAnonimaValidator->errors();
+                return response()->json($errors, 400);
+            }
 
             $sociosArray = json_decode($request->input('socios'), true);
             $sociosValidator = Validator::make($sociosArray, [
@@ -347,8 +353,15 @@ class SociedadAnonimaController extends Controller
                 //TODO: validar que el total de aportes entre todos los socios = 100
             ]);
 
-            if ($sociedadAnonimaValidator->fails() || $sociosValidator->fails()) {
-                $errors = $sociedadAnonimaValidator->errors()->merge($sociosValidator->errors());
+            $paisesEstadosArray = json_decode($request->input('paises_estados'), true);
+            $paisesValidator = Validator::make($paisesEstadosArray, [
+                '*.code' => 'required|string|between:1,5',
+                '*.name' => 'required|string|between:2,100',
+                '*.continent' => 'required|string|between:2,100',
+            ]);
+
+            if ($sociosValidator->fails() || $paisesValidator->fails()) {
+                $errors = $sociosValidator->errors()->merge($paisesValidator->errors());
                 return response()->json($errors, 400);
             }
 
@@ -363,6 +376,13 @@ class SociedadAnonimaController extends Controller
             $service->updateSocios(
                 $sociedadAnonima,
                 $sociosArray,
+            );
+
+            /* Actualizar estados */
+            $sociedadAnonima->estados()->detach();
+            $service->storeEstados(
+                $sociedadAnonima,
+                $paisesEstadosArray,
             );
 
             /* Se marca la actividad como completada */
@@ -523,7 +543,7 @@ class SociedadAnonimaController extends Controller
                 'archivo_estatuto' => 'required|mimes:docx,odt,pdf'
             ]);
 
-            if ($sociedadAnonimaValidator->fails()){
+            if ($sociedadAnonimaValidator->fails()) {
                 $errors = $sociedadAnonimaValidator->errors();
                 return response()->json($errors, 400);
             }
@@ -586,8 +606,8 @@ class SociedadAnonimaController extends Controller
                     $sociosArray,
                 );
 
-                /* Guardar países */
-                $service->storePaisesEstados(
+                /* Guardar estados */
+                $service->storeEstados(
                     $sociedadAnonima,
                     $paisesEstadosArray,
                 );
