@@ -21,8 +21,15 @@ class Pais extends Model
     protected $fillable = [
         'code',
         'name',
-        'continent'
     ];
+
+    /**
+     * Obtener el Continente.
+     */
+    public function continente()
+    {
+        return $this->belongsTo(Continente::class);
+    }
 
     /**
      * Obtener los estados.
