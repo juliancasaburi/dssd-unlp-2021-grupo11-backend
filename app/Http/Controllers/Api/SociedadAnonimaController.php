@@ -490,7 +490,10 @@ class SociedadAnonimaController extends Controller
             $bonitaProcessHelper = new BonitaProcessHelper();
             // estado_evaluacion
             $bonitaCaseId = $sociedadAnonima->bonita_case_id;
-            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Aprobado por empleado-mesa-de-entradas");
+            $nuevoEstadoEvaluacion = "Aprobado por empleado-mesa-de-entradas";
+            $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+            $sociedadAnonima->save();
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
             $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
             $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], true);
 
