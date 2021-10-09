@@ -487,7 +487,11 @@ class SociedadAnonimaController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
             $bonitaTaskHelper = new BonitaTaskHelper();
-            $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $sociedadAnonima->bonita_case_id);
+            $bonitaProcessHelper = new BonitaProcessHelper();
+            // estado_evaluacion
+            $bonitaCaseId = $sociedadAnonima->bonita_case_id;
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Aprobado por empleado-mesa-de-entradas");
+            $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
             $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], true);
 
             return response()->json("Estatuto actualizado", 200);
