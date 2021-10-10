@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Continente;
+use App\Models\Estado;
+use App\Models\Pais;
 use App\Models\SociedadAnonima;
 use App\Models\Socio;
 use App\Models\User;
@@ -123,6 +126,31 @@ class SociedadAnonimaService
     ) {
         $this->createSociedadFolder($nombreSociedad, false);
         $this->storePDFFile($pdf, $nombreSociedad);
+    }
+    
+    public function storeEstados(
+        SociedadAnonima $sociedadAnonima,
+        array $paisesEstados
+    ) {
+        foreach ($paisesEstados as $datosPaisEstados) {
+            $continente = Continente::firstOrCreate([
+                'name' => $datosPaisEstados["continent"]
+            ]);
+            $pais = Pais::firstOrCreate([
+                'code' => $datosPaisEstados["code"],
+                'name' => $datosPaisEstados["name"]
+            ]);
+            $pais->continente()->associate($continente);
+            $pais->save();
+            foreach ($datosPaisEstados["estados"] as $datosEstado){
+                $estado = Estado::firstOrCreate([
+                    'name' => $datosEstado["name"],
+                ]);
+                $estado->pais()->associate($pais);
+                $estado->save();
+                $sociedadAnonima->estados()->save($estado);
+            }
+        }
     }
 
     public function updateSociedadAnonima(

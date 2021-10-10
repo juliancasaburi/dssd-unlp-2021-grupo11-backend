@@ -369,12 +369,18 @@ class SociedadAnonimaController extends Controller
                 return response()->json("No puedes corregir esta S.A.", 403);
 
             $sociedadAnonimaValidator = Validator::make($request->all(), [
-                'fecha_creacion' => 'required|date|',
+                'fecha_creacion' => 'required|date|before_or_equal:now',
                 'domicilio_legal' => 'required|string|between:2,100',
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
+                'paises_estados' => 'required|json',
             ]);
+
+            if ($sociedadAnonimaValidator->fails()) {
+                $errors = $sociedadAnonimaValidator->errors();
+                return response()->json($errors, 400);
+            }
 
             $sociosArray = json_decode($request->input('socios'), true);
             $sociosValidator = Validator::make($sociosArray, [
@@ -385,8 +391,15 @@ class SociedadAnonimaController extends Controller
                 //TODO: validar que el total de aportes entre todos los socios = 100
             ]);
 
-            if ($sociedadAnonimaValidator->fails() || $sociosValidator->fails()) {
-                $errors = $sociedadAnonimaValidator->errors()->merge($sociosValidator->errors());
+            $paisesEstadosArray = json_decode($request->input('paises_estados'), true);
+            $paisesValidator = Validator::make($paisesEstadosArray, [
+                '*.code' => 'required|string|between:1,5',
+                '*.name' => 'required|string|between:2,100',
+                '*.continent' => 'required|string|between:2,100',
+            ]);
+
+            if ($sociosValidator->fails() || $paisesValidator->fails()) {
+                $errors = $sociosValidator->errors()->merge($paisesValidator->errors());
                 return response()->json($errors, 400);
             }
 
@@ -401,6 +414,13 @@ class SociedadAnonimaController extends Controller
             $service->updateSocios(
                 $sociedadAnonima,
                 $sociosArray,
+            );
+
+            /* Actualizar estados */
+            $sociedadAnonima->estados()->detach();
+            $service->storeEstados(
+                $sociedadAnonima,
+                $paisesEstadosArray,
             );
 
             /* Se marca la actividad como completada */
@@ -505,7 +525,14 @@ class SociedadAnonimaController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
             $bonitaTaskHelper = new BonitaTaskHelper();
-            $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $sociedadAnonima->bonita_case_id);
+            $bonitaProcessHelper = new BonitaProcessHelper();
+            // estado_evaluacion
+            $bonitaCaseId = $sociedadAnonima->bonita_case_id;
+            $nuevoEstadoEvaluacion = "Aprobado por empleado-mesa-de-entradas";
+            $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+            $sociedadAnonima->save();
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+            $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
             $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], true);
 
             return response()->json("Estatuto actualizado", 200);
@@ -557,8 +584,14 @@ class SociedadAnonimaController extends Controller
                 'domicilio_real' => 'required|string|between:2,100',
                 'email_apoderado' => 'required|string|email',
                 'socios' => 'required|json',
+                'paises_estados' => 'required|json',
                 'archivo_estatuto' => 'required|mimes:docx,odt,pdf'
             ]);
+
+            if ($sociedadAnonimaValidator->fails()) {
+                $errors = $sociedadAnonimaValidator->errors();
+                return response()->json($errors, 400);
+            }
 
             $sociosArray = json_decode($request->input('socios'), true);
             $sociosValidator = Validator::make($sociosArray, [
@@ -569,8 +602,15 @@ class SociedadAnonimaController extends Controller
                 //TODO: validar que el total de aportes entre todos los socios = 100
             ]);
 
-            if ($sociedadAnonimaValidator->fails() || $sociosValidator->fails()) {
-                $errors = $sociedadAnonimaValidator->errors()->merge($sociosValidator->errors());
+            $paisesEstadosArray = json_decode($request->input('paises_estados'), true);
+            $paisesValidator = Validator::make($paisesEstadosArray, [
+                '*.code' => 'required|string|between:1,5',
+                '*.name' => 'required|string|between:2,100',
+                '*.continent' => 'required|string|between:2,100',
+            ]);
+
+            if ($sociosValidator->fails() || $paisesValidator->fails()) {
+                $errors = $sociosValidator->errors()->merge($paisesValidator->errors());
                 return response()->json($errors, 400);
             }
 
@@ -594,7 +634,6 @@ class SociedadAnonimaController extends Controller
             $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Pendiente mesa de entradas");
 
-
             if ($startProcessResponse->status() == 200) {
                 $sociedadAnonima = $service->storeNewSociedadAnonima(
                     $request->file('archivo_estatuto'),
@@ -607,9 +646,15 @@ class SociedadAnonimaController extends Controller
                 );
 
                 /* Guardar socios */
-                $sociedadAnonima = $service->storeSocios(
+                $service->storeSocios(
                     $sociedadAnonima,
                     $sociosArray,
+                );
+
+                /* Guardar estados */
+                $service->storeEstados(
+                    $sociedadAnonima,
+                    $paisesEstadosArray,
                 );
 
                 return response()->json("Solicitud creada", 200);

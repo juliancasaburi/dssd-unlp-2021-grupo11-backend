@@ -15,7 +15,7 @@ class GoogleDriveServiceProvider extends \Illuminate\Support\ServiceProvider{ //
                 $client->setClientSecret($config['clientSecret']);
                 $client->refreshToken($config['refreshToken']);
                 $service = new \Google_Service_Drive($client);
-                $adapter = new \App\GoogleDriveAdapterPSR7Fix($service,$config['folder']??'/', $options);
+                $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service,$config['folder']??'/', $options);
                 return new \League\Flysystem\Filesystem($adapter);
             });
         }catch(\Exception $e){  }

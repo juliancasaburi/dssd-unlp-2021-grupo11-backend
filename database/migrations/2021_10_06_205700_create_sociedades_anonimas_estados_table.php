@@ -17,13 +17,13 @@ class CreateSociedadesAnonimasEstadosTable extends Migration
             $table->id();
             $table->unsignedBigInteger('sociedad_anonima_id');
             $table->unsignedBigInteger('estado_id');
+            $table->timestamps();
             $table->foreign('sociedad_anonima_id')
                 ->references('id')
                 ->on('sociedades_anonimas');
             $table->foreign('estado_id')
                 ->references('id')
                 ->on('estados');
-             $table->timestamps();
         });
     }
 
