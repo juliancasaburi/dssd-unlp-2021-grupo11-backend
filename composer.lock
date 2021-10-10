@@ -2091,16 +2091,16 @@
         },
         {
             "name": "masbug/flysystem-google-drive-ext",
-            "version": "1.2.3",
+            "version": "v1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/masbug/flysystem-google-drive-ext.git",
-                "reference": "1572b60e44cb98b18d54e1ad440547a2cb6fc0ef"
+                "reference": "698fd6c093bffbb35bd0df9ce708cf97f5218177"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/masbug/flysystem-google-drive-ext/zipball/1572b60e44cb98b18d54e1ad440547a2cb6fc0ef",
-                "reference": "1572b60e44cb98b18d54e1ad440547a2cb6fc0ef",
+                "url": "https://api.github.com/repos/masbug/flysystem-google-drive-ext/zipball/698fd6c093bffbb35bd0df9ce708cf97f5218177",
+                "reference": "698fd6c093bffbb35bd0df9ce708cf97f5218177",
                 "shasum": ""
             },
             "require": {
@@ -2143,9 +2143,9 @@
             ],
             "support": {
                 "issues": "https://github.com/masbug/flysystem-google-drive-ext/issues",
-                "source": "https://github.com/masbug/flysystem-google-drive-ext/tree/1.2.3"
+                "source": "https://github.com/masbug/flysystem-google-drive-ext/tree/v1.2.4"
             },
-            "time": "2021-07-13T19:09:30+00:00"
+            "time": "2021-10-07T05:53:24+00:00"
         },
         {
             "name": "monolog/monolog",
