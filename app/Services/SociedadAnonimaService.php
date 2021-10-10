@@ -30,6 +30,12 @@ class SociedadAnonimaService
         return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
     }
 
+    public function getPublicFolderUrl(string $nombreSociedad)
+    {
+        $metaData = Storage::disk('google')->getDriver()->getAdapter()->getMetaData("{$this->getPublicFolderPathFromConfig()}/{$nombreSociedad}");
+        return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
+    }
+
     private function getSociedadFolderPath($nombreSociedad, $private = true)
     {
         if ($private)
@@ -124,8 +130,15 @@ class SociedadAnonimaService
         $pdf,
         $nombreSociedad
     ) {
-        $this->createSociedadFolder($nombreSociedad, false);
         $this->storePDFFile($pdf, $nombreSociedad);
+    }
+
+    public function copyEstatutoToPublico($nombreSociedad) {
+        $newestFolderData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($this->getSociedadFolderPath($nombreSociedad, true), false));
+        $estatutoFileData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($newestFolderData["path"], false));
+        $this->createSociedadFolder($nombreSociedad, false);
+        // TODO: Fix file extension
+        Storage::disk('google')->getDriver()->getAdapter()->copy($estatutoFileData["path"], $this->getSociedadFolderPath($nombreSociedad, false)."/{$nombreSociedad}/");
     }
     
     public function storeEstados(

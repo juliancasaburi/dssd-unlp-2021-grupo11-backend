@@ -6,10 +6,10 @@
 </head>
 
 <body>
-    <h1>Nombre: {{ $data["nombre"] }}</h1>
-    <h1>Fecha de creación: {{ $data["fechaCreacion"] }}</h1>
+    <h1>Nombre: {{ $nombre }}</h1>
+    <h1>Fecha de creación: {{ $fechaCreacion }}</h1>
     <h1>Socios</h1>
-    @foreach ($data["socios"] as $socio)
+    @foreach ($socios as $socio)
         <h2>Nombre {{ $socio->nombre }}</h2>
         <h2>Apellido {{ $socio->apellido }}</h2>
         <h2>Porcentaje {{ $socio->porcentaje }}</h2>

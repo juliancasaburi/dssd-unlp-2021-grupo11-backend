@@ -273,13 +273,16 @@ class SociedadAnonimaController extends Controller
 
         if (str_contains($rol, "escribano"))
         {
-            // Solicitar estampillado y setear numero_hash
+            /* Esperando desarrollo del servicio de estampillado
+            Solicitar estampillado y setear numero_hash
             $estampilladoHelper = new EstampilladoHelper();
             $escribanoCredentials = [
                 "email" => $user->email,
                 "password" => $user->password
             ];
             $numeroHash = $estampilladoHelper->solicitarEstampillado($sociedadAnonima->numero_expediente, $escribanoCredentials);
+            */
+            $numeroHash = "hashTest";
             $sociedadAnonima->numero_hash = $numeroHash;
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
 
@@ -287,15 +290,17 @@ class SociedadAnonimaController extends Controller
             $qrHelper = new QRHelper();
             $qr = $qrHelper->generarQR(config('app.url') . "/api/sa/{$numeroHash}");
 
-            /* Guardar pdf que contiene la información publica (Nombre, fecha de creación y socios) y el QR */
+            /* Guardar estatuto, pdf que contiene la información publica (Nombre, fecha de creación y socios) y el QR */
             // TODO: agregar la imagen QR dentro del pdf generado.
-            // TODO: copiar el archivo estatuto más reciente que está en la carpeta Privado a la carpeta Publico.
             $data = [
                 "nombre" => $sociedadAnonima->nombre,
                 "fechaCreacion" => $sociedadAnonima->fecha_creacion,
-                "socios" => $sociedadAnonima->socios()
+                "socios" => $sociedadAnonima->socios()->get()
             ];
             $pdf = PDF::loadView('pdf.infoPublicaSA', $data);
+
+            // Store files
+            $service->copyEstatutoToPublico($sociedadAnonima->nombre);
             $service->storePDF(
                 $pdf->download()->getOriginalContent(),
                 $sociedadAnonima->nombre
