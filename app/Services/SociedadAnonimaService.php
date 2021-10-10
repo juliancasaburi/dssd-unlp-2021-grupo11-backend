@@ -27,25 +27,43 @@ class SociedadAnonimaService
         return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
     }
 
-    private function getSociedadFolderPath($nombreSociedad)
+    private function getSociedadFolderPath($nombreSociedad, $private = true)
     {
-        return "{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}/";
+        if ($private)
+            return "{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}/";
+        else
+            return "{$this->getPublicFolderPathFromConfig()}/{$nombreSociedad}/";
     }
 
     private function storeEstatutoFile($archivoEstatuto, $nombreSociedad)
     {
 
-        $newFolderPath = $this->getSociedadFolderPath($nombreSociedad) . Carbon::now('GMT-3')->format('d-m-y-H-i');
-        $archivoEstatuto->storeAs($newFolderPath, "estatuto_{$nombreSociedad}.{$archivoEstatuto->extension()}", 'google');
+        $folderPath = $this->getSociedadFolderPath($nombreSociedad) . Carbon::now('GMT-3')->format('d-m-y-H-i');
+        $archivoEstatuto->storeAs($folderPath, "estatuto_{$nombreSociedad}.{$archivoEstatuto->extension()}", 'google');
     }
 
-    private function createSociedadFolder($nombreSociedad)
+    private function createSociedadFolder($nombreSociedad, $private = true)
     {
         $config = new Config();
-        $folderPath = $this->getSociedadFolderPath($nombreSociedad);
+        if ($private)
+            $folderPath = $this->getSociedadFolderPath($nombreSociedad);
+        else
+            $folderPath = $this->getSociedadFolderPath($nombreSociedad, false);
 
         Storage::disk('google')->getDriver()->getAdapter()->createDir($folderPath, $config);
         Storage::disk('google')->getDriver()->getAdapter()->setVisibility($folderPath, "public");
+    }
+
+    private function storePDFFile($pdf, $nombreSociedad)
+    {
+        $folderPath = $this->getSociedadFolderPath($nombreSociedad, false);
+        Storage::disk('google')->put($folderPath."info_publica_{$nombreSociedad}.pdf", $pdf);
+    }
+
+    private function storeQRFile($qr, $nombreSociedad)
+    {
+        $folderPath = $this->getSociedadFolderPath($nombreSociedad, false);
+        Storage::disk('google')->put($folderPath."qr_{$nombreSociedad}.png", $qr);
     }
 
     public function storeNewSociedadAnonima(
@@ -90,6 +108,21 @@ class SociedadAnonimaService
             }
         }
         $sociedadAnonima->save();
+    }
+
+    public function storeQR(
+        $qr,
+        $nombreSociedad
+    ) {
+        $this->storeQRFile($qr, $nombreSociedad);
+    }
+
+    public function storePDF(
+        $pdf,
+        $nombreSociedad
+    ) {
+        $this->createSociedadFolder($nombreSociedad, false);
+        $this->storePDFFile($pdf, $nombreSociedad);
     }
 
     public function updateSociedadAnonima(
@@ -144,6 +177,11 @@ class SociedadAnonimaService
     public function getSociedadAnonimaWithSociosById(int $id)
     {
         return SociedadAnonima::with('socios')->find($id);
+    }
+
+    public function getSociedadAnonimaWithSociosByNumeroHash(string $numeroHash)
+    {
+        return SociedadAnonima::with('socios')->where('numero_hash', $numeroHash)->first();
     }
 
     public function getSociedadAnonimaWithSociosByCaseId(int $bonitaCaseId)
