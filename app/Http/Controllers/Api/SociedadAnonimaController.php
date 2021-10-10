@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Helpers\BonitaProcessHelper;
-use App\Services\SociedadAnonimaService;
-use App\Helpers\BonitaTaskHelper;
-use App\Models\SociedadAnonima;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Models\User;
-
+use App\Models\SociedadAnonima;
+use App\Services\SociedadAnonimaService;
+use App\Helpers\BonitaProcessHelper;
+use App\Helpers\BonitaTaskHelper;
+use App\Helpers\EstampilladoHelper;
+use App\Helpers\QRHelper;
+use PDF;
 class SociedadAnonimaController extends Controller
 {
     /**
@@ -250,7 +251,8 @@ class SociedadAnonimaController extends Controller
         $bonitaCaseId = $response["caseId"];
         $sociedadAnonima = $service->getSociedadAnonimaByCaseId($bonitaCaseId);
 
-        $rol = auth()->user()->getRoleNames()->first();
+        $user = auth()->user();
+        $rol = $user->getRoleNames()->first();
         $nuevoEstadoEvaluacion = '';
         $bonitaProcessHelper = new BonitaProcessHelper();
 
@@ -268,6 +270,42 @@ class SociedadAnonimaController extends Controller
         $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
         // Actualizar la SociedadAnonima
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+
+        if (str_contains($rol, "escribano"))
+        {
+            // Solicitar estampillado y setear numero_hash
+            $estampilladoHelper = new EstampilladoHelper();
+            $escribanoCredentials = [
+                "email" => $user->email,
+                "password" => $user->password
+            ];
+            $numeroHash = $estampilladoHelper->solicitarEstampillado($sociedadAnonima->numero_expediente, $escribanoCredentials);
+            $sociedadAnonima->numero_hash = $numeroHash;
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
+
+            // Generar Código QR
+            $qrHelper = new QRHelper();
+            $qr = $qrHelper->generarQR(config('app.url') . "/api/sa/{$numeroHash}");
+
+            /* Guardar pdf que contiene la información publica (Nombre, fecha de creación y socios) y el QR */
+            // TODO: agregar la imagen QR dentro del pdf generado.
+            // TODO: copiar el archivo estatuto más reciente que está en la carpeta Privado a la carpeta Publico.
+            $data = [
+                "nombre" => $sociedadAnonima->nombre,
+                "fechaCreacion" => $sociedadAnonima->fecha_creacion,
+                "socios" => $sociedadAnonima->socios()
+            ];
+            $pdf = PDF::loadView('pdf.infoPublicaSA', $data);
+            $service->storePDF(
+                $pdf->download()->getOriginalContent(),
+                $sociedadAnonima->nombre
+            );
+            $service->storeQR(
+                $qr,
+                $sociedadAnonima->nombre
+            );
+        }
+        
         $sociedadAnonima->save();
 
         return response()->json("Tarea aprobada/rechazada", 200);
