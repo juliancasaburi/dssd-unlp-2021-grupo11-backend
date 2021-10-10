@@ -17,7 +17,10 @@ class CreatePaisesTable extends Migration
             $table->id();
             $table->string('code');
             $table->string('name');
-            $table->string('continent');
+            $table->unsignedBigInteger('continente_id')->nullable();
+            $table->foreign('continente_id')
+                ->references('id')
+                ->on('continentes');
             $table->timestamps();
         });
     }
