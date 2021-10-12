@@ -28,6 +28,6 @@ class Estado extends Model
      */
     public function sociedadesAnonimas()
     {
-        return $this->belongsToMany(SociedadAnonima::class, 'sociedades_anonimas_estados', 'sociedad_anonima_id', 'estado_id')->withTimestamps();
+        return $this->belongsToMany(SociedadAnonima::class, 'sociedades_anonimas_estados', 'estado_id', 'sociedad_anonima_id')->withTimestamps();
     }
 }
