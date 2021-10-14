@@ -102,7 +102,11 @@ class BonitaProcessHelper
                     [
                         "name" => "email_apoderado",
                         "value" => $caseData['email_apoderado']
-                    ]
+                    ],
+                    [
+                        "name" => "estado_evaluacion",
+                        "value" => "Pendiente mesa de entradas"
+                    ],
                     ],
             ]);
 
