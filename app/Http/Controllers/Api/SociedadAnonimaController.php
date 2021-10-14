@@ -594,7 +594,6 @@ class SociedadAnonimaController extends Controller
             while (empty($userTasksResponse))
                 $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
             $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
-            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", "Pendiente mesa de entradas");
 
             if ($startProcessResponse->status() == 200) {
                 $sociedadAnonima = $service->storeNewSociedadAnonima(
