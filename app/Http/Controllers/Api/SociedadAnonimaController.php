@@ -273,22 +273,18 @@ class SociedadAnonimaController extends Controller
 
         if (str_contains($rol, "escribano"))
         {
-            /* Esperando desarrollo del servicio de estampillado
-            Solicitar estampillado y setear numero_hash
+            // Solicitar estampillado y setear numero_hash
             $estampilladoHelper = new EstampilladoHelper();
             $escribanoCredentials = [
                 "email" => $user->email,
                 "password" => $user->password
             ];
-            $numeroHash = $estampilladoHelper->solicitarEstampillado($sociedadAnonima->numero_expediente, $escribanoCredentials);
-            */
-            $numeroHash = "hashTest";
+            $loginResponse = $estampilladoHelper->login($escribanoCredentials);
+            $estampilladoResponse = $estampilladoHelper->solicitarEstampillado($loginResponse["auth"]["access_token"], $sociedadAnonima->numero_expediente);
+            $numeroHash = $estampilladoResponse["numero_hash"];
+            $qr = $estampilladoResponse["qr"];
             $sociedadAnonima->numero_hash = $numeroHash;
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
-
-            // Generar Código QR
-            $qrHelper = new QRHelper();
-            $qr = $qrHelper->generarQR(config('app.url') . "/api/sa/{$numeroHash}");
 
             /* Guardar estatuto, pdf que contiene la información publica (Nombre, fecha de creación y socios) y el QR */
             // TODO: agregar la imagen QR dentro del pdf generado.
