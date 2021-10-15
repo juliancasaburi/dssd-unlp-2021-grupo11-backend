@@ -40,8 +40,4 @@ return [
         'endpoint' => env('ESTAMPILLADO_ENDPOINT'),
     ],
 
-    'qr' => [
-        'api_url' => env('QR_API_URL'),
-    ],
-
 ];
