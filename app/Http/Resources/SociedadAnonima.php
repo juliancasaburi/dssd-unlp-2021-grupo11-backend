@@ -30,7 +30,7 @@ class SociedadAnonima extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'socios' => $this->socios,
-            'estados' => Estado::collection($this->estados),
+            'estados' => Estado::collection($this->estados->sortBy('pais')),
             'url_carpeta_estatuto' => $this->when(Auth::user()->getRoleNames()->first() == 'escribano-area-legales', $service->getPrivateFolderUrl($this->nombre)),
         ];
     }
