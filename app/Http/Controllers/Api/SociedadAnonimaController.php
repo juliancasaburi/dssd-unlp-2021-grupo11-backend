@@ -10,7 +10,8 @@ use App\Services\SociedadAnonimaService;
 use App\Helpers\BonitaTaskHelper;
 use App\Models\SociedadAnonima;
 use Illuminate\Validation\Rule;
-use App\Models\User;
+use App\Http\Resources\SociedadAnonima as SociedadAnonimaResource;
+use App\Http\Resources\SociedadAnonimaCollection;
 
 class SociedadAnonimaController extends Controller
 {
@@ -48,7 +49,7 @@ class SociedadAnonimaController extends Controller
      */
     public function getUserSociedadesAnonimas(SociedadAnonimaService $service)
     {
-        return response()->json($service->getUserSociedadesAnonimasWithSocios(auth()->user()), 200);
+        return response()->json(new SociedadAnonimaCollection($service->getUserSociedadesAnonimasWithSociosAndEstados(auth()->user())), 200);
     }
 
     /**
@@ -99,11 +100,11 @@ class SociedadAnonimaController extends Controller
      */
     public function getUserSociedadAnonima(Request $request, $id, SociedadAnonimaService $service)
     {
-        $sociedadAnonima = $service->getSociedadAnonimaWithSociosById($id);
+        $sociedadAnonima = $service->getSociedadAnonimaWithSociosAndEstadosById($id);
         if ($request->user()->cannot('view', $sociedadAnonima))
             return response()->json("Forbidden", 403);
         else
-            return response()->json($sociedadAnonima, 200);
+            return response()->json(new SociedadAnonimaResource($sociedadAnonima), 200);
     }
 
     /**
@@ -166,12 +167,9 @@ class SociedadAnonimaController extends Controller
         if ($taskData["assigned_id"] != $user->bonita_user_id)
             return response()->json("No tienes acceso a los datos de esta sociedad.", 403);
 
-        $sociedadAnonima = $service->getSociedadAnonimaWithSociosByCaseId($bonitaCaseId);
+        $sociedadAnonima = $service->getSociedadAnonimaWithSociosAndEstadosByCaseId($bonitaCaseId);
 
-        if ($user->getRoleNames()->first() == 'escribano-area-legales')
-            $sociedadAnonima["url_carpeta_estatuto"] = $service->getPrivateFolderUrl($sociedadAnonima->nombre);
-
-        return response()->json($sociedadAnonima, 200, [], JSON_UNESCAPED_SLASHES);
+        return response()->json(new SociedadAnonimaResource($sociedadAnonima), 200, [], JSON_UNESCAPED_SLASHES);
     }
 
     /**
