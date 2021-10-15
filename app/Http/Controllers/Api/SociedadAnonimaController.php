@@ -11,8 +11,8 @@ use App\Services\SociedadAnonimaService;
 use App\Helpers\BonitaProcessHelper;
 use App\Helpers\BonitaTaskHelper;
 use App\Helpers\EstampilladoHelper;
-use App\Helpers\QRHelper;
 use PDF;
+
 class SociedadAnonimaController extends Controller
 {
     /**
@@ -271,8 +271,7 @@ class SociedadAnonimaController extends Controller
         // Actualizar la SociedadAnonima
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
 
-        if (str_contains($rol, "escribano"))
-        {
+        if (str_contains($rol, "escribano")) {
             // Solicitar estampillado y setear numero_hash
             $estampilladoHelper = new EstampilladoHelper();
             $escribanoCredentials = [
@@ -306,7 +305,7 @@ class SociedadAnonimaController extends Controller
                 $sociedadAnonima->nombre
             );
         }
-        
+
         $sociedadAnonima->save();
 
         return response()->json("Tarea aprobada/rechazada", 200);
