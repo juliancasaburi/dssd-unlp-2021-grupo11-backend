@@ -8,6 +8,9 @@
 <body>
     <h1>Información publica de la S.A.</h1>
     <hr>
+    <div>
+        <img src="data:image/png;base64, {{ $qr }}"/>
+    <div>
     <h1>Nombre: {{ $nombre }}</h1>
     <h1>Fecha de creación: {{ $fechaCreacion }}</h1>
     <h1>Socios</h1>
