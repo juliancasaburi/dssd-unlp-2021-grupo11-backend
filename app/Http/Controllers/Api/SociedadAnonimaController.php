@@ -288,6 +288,7 @@ class SociedadAnonimaController extends Controller
                 "fechaCreacion" => $sociedadAnonima->fecha_creacion,
                 "socios" => $sociedadAnonima->socios()->get(),
                 "apoderado_id" => $sociedadAnonima->apoderado_id,
+                "qr" => $estampilladoResponse["qr"],
             ];
             $pdf = PDF::loadView('pdf.infoPublicaSA', $data);
 
