@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\SociedadAnonimaCollection;
 use App\Models\Continente;
 use App\Models\Estado;
 use App\Models\Pais;
@@ -73,6 +74,12 @@ class SociedadAnonimaService
     {
         $folderPath = $this->getSociedadFolderPath($nombreSociedad, false);
         Storage::disk('google')->put($folderPath."qr_{$nombreSociedad}.png", $qr);
+    }
+
+    public function getPublicPDFContents($numeroHash)
+    {
+        $nombreSociedad = SociedadAnonima::where('numero_hash', $numeroHash)->first()->nombre;
+        return Storage::disk('google')->getDriver()->getAdapter()->read($this->getSociedadFolderPath($nombreSociedad, false) . "info_publica_{$nombreSociedad}.pdf")['contents'];
     }
 
     public function storeNewSociedadAnonima(

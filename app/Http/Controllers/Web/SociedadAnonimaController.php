@@ -14,7 +14,10 @@ class SociedadAnonimaController extends Controller
      */
     public function infoPublicaSA(SociedadAnonimaService $service, $numeroHash)
     {
-        // TODO: retornar pdf
-        return response()->json($service->getSociedadAnonimaWithSociosByNumeroHash($numeroHash));
+        $pdfContents = $service->getPublicPDFContents($numeroHash);
+        return response($pdfContents, 200, [
+            "Content-type"        => "application/pdf",
+            "Content-Disposition" => "inline; filename=info_publica_{$numeroHash}.pdf",
+        ]);
     }
 }
