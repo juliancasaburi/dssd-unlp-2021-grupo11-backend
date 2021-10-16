@@ -210,14 +210,14 @@ class SociedadAnonimaService
         $this->storeEstatutoFile($archivoEstatuto, $nombreSociedad);
     }
 
-    public function getUserSociedadesAnonimasWithSocios(User $user)
+    public function getUserSociedadesAnonimasWithSociosAndEstados(User $user)
     {
-        return SociedadAnonima::with('socios')->where('created_by', $user->id)->get();
+        return SociedadAnonima::with(['socios', 'estados'])->where('created_by', $user->id)->get();
     }
 
-    public function getSociedadAnonimaWithSociosById(int $id)
+    public function getSociedadAnonimaWithSociosAndEstadosById(int $id)
     {
-        return SociedadAnonima::with('socios')->find($id);
+        return SociedadAnonima::with(['socios', 'estados'])->find($id);
     }
 
     public function getSociedadAnonimaWithSociosByNumeroHash(string $numeroHash)
@@ -225,9 +225,9 @@ class SociedadAnonimaService
         return SociedadAnonima::with('socios')->where('numero_hash', $numeroHash)->first();
     }
 
-    public function getSociedadAnonimaWithSociosByCaseId(int $bonitaCaseId)
+    public function getSociedadAnonimaWithSociosAndEstadosByCaseId(int $bonitaCaseId)
     {
-        return SociedadAnonima::with('socios')->where('bonita_case_id', $bonitaCaseId)->first();
+        return SociedadAnonima::with(['socios', 'estados'])->where('bonita_case_id', $bonitaCaseId)->first();
     }
 
     public function getSociedadAnonimaByCaseId(int $bonitaCaseId)
