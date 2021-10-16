@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <h1>Información publica de la S.A.</h1>
+    <h1>Información pública de la S.A.</h1>
     <hr>
     <div>
         <img src="data:image/png;base64, {{ $qr }}"/>

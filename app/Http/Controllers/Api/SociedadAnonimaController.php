@@ -18,6 +18,40 @@ use App\Http\Resources\SociedadAnonimaCollection;
 class SociedadAnonimaController extends Controller
 {
     /**
+     * Obtener el pdf con la información publica de la SociedadAnonima.
+     *
+     * @OA\Get(
+     *    path="/api/sa/{numeroHash}",
+     *    summary="infoPublicaSA",
+     *    description="Obtener el pdf con la información publica de la SociedadAnonima.",
+     *    operationId="infoPublicaSA",
+     *    tags={"sociedadAnonima-publico"},
+     *    @OA\Parameter(
+     *         name="numeroHash",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Retorna pdf",
+     *    ),
+     * )
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function infoPublicaSA(SociedadAnonimaService $service, $numeroHash)
+    {
+        $pdfContents = $service->getPublicPDFContents($numeroHash);
+        return response($pdfContents, 200, [
+            "Content-type"        => "application/pdf",
+            "Content-Disposition" => "attachment; filename=info_publica_{$numeroHash}.pdf",
+        ]);
+    }
+
+    /**
      * Obtener las sociedad anónimas registradas por el usuario actual.
      *
      * @OA\Get(
