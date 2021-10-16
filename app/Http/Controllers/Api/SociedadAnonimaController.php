@@ -303,7 +303,7 @@ class SociedadAnonimaController extends Controller
             $estampilladoHelper = new EstampilladoHelper();
             $escribanoCredentials = [
                 "email" => $user->email,
-                "password" => "grupo11"
+                "password" => $user->password
             ];
             $loginResponse = $estampilladoHelper->login($escribanoCredentials);
             $estampilladoResponse = $estampilladoHelper->solicitarEstampillado($loginResponse["auth"]["access_token"], $sociedadAnonima->numero_expediente);
