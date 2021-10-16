@@ -259,28 +259,25 @@ class SociedadAnonimaController extends Controller
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
             // Setear numero_expediente
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
+            $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
         }
-
-        // estado_evaluacion
-        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
-        // Completar la tarea en Bonita
-        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
-        // Actualizar la SociedadAnonima
-        $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
 
         if (str_contains($rol, "escribano")) {
             // Solicitar estampillado y setear numero_hash
             $estampilladoHelper = new EstampilladoHelper();
             $escribanoCredentials = [
                 "email" => $user->email,
-                "password" => $user->password
+                "password" => "grupo11"
             ];
             $loginResponse = $estampilladoHelper->login($escribanoCredentials);
             $estampilladoResponse = $estampilladoHelper->solicitarEstampillado($loginResponse["auth"]["access_token"], $sociedadAnonima->numero_expediente);
             $numeroHash = $estampilladoResponse["numero_hash"];
-            $qr = $estampilladoResponse["qr"];
+            $image = str_replace('data:image/png;base64,', '', $estampilladoResponse["qr"]);
+            $qr = str_replace(' ', '+', $image);
+            $qr = base64_decode($qr);
+
             $sociedadAnonima->numero_hash = $numeroHash;
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
 
@@ -289,7 +286,8 @@ class SociedadAnonimaController extends Controller
             $data = [
                 "nombre" => $sociedadAnonima->nombre,
                 "fechaCreacion" => $sociedadAnonima->fecha_creacion,
-                "socios" => $sociedadAnonima->socios()->get()
+                "socios" => $sociedadAnonima->socios()->get(),
+                "apoderado_id" => $sociedadAnonima->apoderado_id,
             ];
             $pdf = PDF::loadView('pdf.infoPublicaSA', $data);
 
@@ -304,6 +302,13 @@ class SociedadAnonimaController extends Controller
                 $sociedadAnonima->nombre
             );
         }
+
+        // estado_evaluacion
+        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+        // Completar la tarea en Bonita
+        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
+        // Actualizar la SociedadAnonima
+        $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
 
         $sociedadAnonima->save();
 

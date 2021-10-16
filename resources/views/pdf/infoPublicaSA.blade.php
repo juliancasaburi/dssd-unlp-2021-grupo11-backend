@@ -6,10 +6,15 @@
 </head>
 
 <body>
+    <h1>Información publica de la S.A.</h1>
+    <hr>
     <h1>Nombre: {{ $nombre }}</h1>
     <h1>Fecha de creación: {{ $fechaCreacion }}</h1>
     <h1>Socios</h1>
     @foreach ($socios as $socio)
+        @if ($socio->id === $apoderado_id)
+            <h1>Apoderado</h1>
+        @endif
         <h2>Nombre {{ $socio->nombre }}</h2>
         <h2>Apellido {{ $socio->apellido }}</h2>
         <h2>Porcentaje {{ $socio->porcentaje }}</h2>
