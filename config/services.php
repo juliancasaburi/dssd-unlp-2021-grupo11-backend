@@ -36,6 +36,10 @@ return [
         'admin_password' => env('BONITA_ADMIN_PASSWORD'),
     ],
 
+    'frontend' => [
+        'endpoint' => env('FRONTEND_ENDPOINT'),
+    ],
+
     'estampillado' => [
         'endpoint' => env('ESTAMPILLADO_ENDPOINT'),
     ],

@@ -24,4 +24,14 @@ class URLHelper
     {
         return config('services.estampillado.endpoint');
     }
+
+    /**
+     * Obtener endpoint del frontend.
+     *
+     * @return string
+     */
+    public function getFrontendURL()
+    {
+        return config('services.frontend.endpoint');
+    }
 }
