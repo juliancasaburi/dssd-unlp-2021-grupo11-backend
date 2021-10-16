@@ -137,8 +137,7 @@ class SociedadAnonimaService
         $newestFolderData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($this->getSociedadFolderPath($nombreSociedad, true), false));
         $estatutoFileData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($newestFolderData["path"], false));
         $this->createSociedadFolder($nombreSociedad, false);
-        // TODO: Fix file extension
-        Storage::disk('google')->getDriver()->getAdapter()->copy($estatutoFileData["path"], $this->getSociedadFolderPath($nombreSociedad, false)."/{$nombreSociedad}/");
+        Storage::disk('google')->getDriver()->getAdapter()->copy($estatutoFileData["path"], $this->getSociedadFolderPath($nombreSociedad, false)."/estatuto_{$nombreSociedad}.pdf");
     }
     
     public function storeEstados(
