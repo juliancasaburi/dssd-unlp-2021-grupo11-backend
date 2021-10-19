@@ -76,6 +76,17 @@ class SociedadAnonimaService
         Storage::disk('google')->put($folderPath."qr_{$nombreSociedad}.png", $qr);
     }
 
+    private function getEstatutoFileData($nombreSociedad){
+        $newestFolderData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($this->getSociedadFolderPath($nombreSociedad, true), false));
+        return last(Storage::disk('google')->getDriver()->getAdapter()->listContents($newestFolderData["path"], false));
+    }
+
+    public function getEstatutoContents($nombreSociedad)
+    {
+        $estatutoFileData = $this->getEstatutoFileData($nombreSociedad);
+        return Storage::disk('google')->getDriver()->getAdapter()->read("{$estatutoFileData["path"]}")['contents'];
+    }
+
     public function getPublicPDFContents($numeroHash)
     {
         $nombreSociedad = SociedadAnonima::where('numero_hash', $numeroHash)->first()->nombre;
@@ -141,8 +152,7 @@ class SociedadAnonimaService
     }
 
     public function copyEstatutoToPublico($nombreSociedad) {
-        $newestFolderData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($this->getSociedadFolderPath($nombreSociedad, true), false));
-        $estatutoFileData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($newestFolderData["path"], false));
+        $estatutoFileData = $this->getEstatutoFileData($nombreSociedad);
         $this->createSociedadFolder($nombreSociedad, false);
         Storage::disk('google')->getDriver()->getAdapter()->copy($estatutoFileData["path"], $this->getSociedadFolderPath($nombreSociedad, false)."/estatuto_{$nombreSociedad}.{$estatutoFileData["extension"]}");
     }
