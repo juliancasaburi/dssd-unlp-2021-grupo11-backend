@@ -81,6 +81,11 @@ class SociedadAnonimaService
         return last(Storage::disk('google')->getDriver()->getAdapter()->listContents($newestFolderData["path"], false));
     }
 
+    public function getEstatutoFileName($nombreSociedad){
+        $estatutoFileData = $this->getEstatutoFileData($nombreSociedad);
+        return $estatutoFileData["filename"] . "." . $estatutoFileData["extension"];
+    }
+
     public function getEstatutoContents($nombreSociedad)
     {
         $estatutoFileData = $this->getEstatutoFileData($nombreSociedad);

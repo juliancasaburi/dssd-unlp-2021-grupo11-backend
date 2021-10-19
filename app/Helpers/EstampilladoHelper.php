@@ -42,10 +42,12 @@ class EstampilladoHelper
      * Obtener número de hash.
      *
      * @param string $jwt
+     * @param string $estatuto
+     * @param string $nombreArchivoEstatuto
      * @param string $numeroExpediente
      * @return \Illuminate\Http\JsonResponse
      */
-    public function solicitarEstampillado($jwt, $numeroExpediente)
+    public function solicitarEstampillado($jwt, $estatuto, $nombreArchivoEstatuto, $numeroExpediente)
     {
         try {
             $urlHelper = new URLHelper();
@@ -53,8 +55,9 @@ class EstampilladoHelper
 
             /* Envío del estatuto, número de expediente y credenciales del escribano que envía a estampillar.
             La respuesta del servicio será un número de hash asociado.*/
-            // TODO: ver Envío del estatuto
-            $response = Http::withToken($jwt)->post($url, [
+            $response = Http::withToken($jwt)->attach(
+                "archivo_estatuto", $estatuto, $nombreArchivoEstatuto
+            )->post($url, [
                 "numero_expediente" => $numeroExpediente,
                 "frontend_endpoint" => $urlHelper->getFrontendURL(),
             ]);

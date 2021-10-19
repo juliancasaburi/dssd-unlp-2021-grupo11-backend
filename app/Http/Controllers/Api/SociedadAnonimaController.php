@@ -306,7 +306,13 @@ class SociedadAnonimaController extends Controller
                 "password" => 'grupo11'
             ];
             $loginResponse = $estampilladoHelper->login($escribanoCredentials);
-            $estampilladoResponse = $estampilladoHelper->solicitarEstampillado($loginResponse["auth"]["access_token"], $sociedadAnonima->numero_expediente);
+            $estatutoContents = $service->getEstatutoContents($sociedadAnonima->nombre);
+            $estampilladoResponse = $estampilladoHelper->solicitarEstampillado(
+                $loginResponse["auth"]["access_token"], 
+                $estatutoContents,
+                $service->getEstatutoFileName($sociedadAnonima->nombre), 
+                $sociedadAnonima->numero_expediente
+            );
             $numeroHash = $estampilladoResponse["numero_hash"];
             $image = str_replace('data:image/png;base64,', '', $estampilladoResponse["qr"]);
             $qr = str_replace(' ', '+', $image);
