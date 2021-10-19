@@ -17,7 +17,6 @@ class SociedadAnonima extends JsonResource
      */
     public function toArray($request)
     {
-        $service = new SociedadAnonimaService();
         return [
             'id' => $this->id,
             'nombre' => $this->nombre,
@@ -29,12 +28,16 @@ class SociedadAnonima extends JsonResource
             'apoderado_id' => $this->apoderado_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'socios' => $this->socios,
-            'estados' => Estado::collection($this->estados->sortBy('pais')),
-            'url_carpeta_estatuto' => $this->when(Auth::user()->getRoleNames()->first() == 'escribano-area-legales', $service->getPrivateFolderUrl($this->nombre)),
-            'url_carpeta_apoderado' => $this->when($this->estado_evaluacion == 'Aprobado por escribano-area-legales', function ($service) {
+            'url_carpeta_estatuto' => $this->when(Auth::user()->getRoleNames()->first() == 'escribano-area-legales', function () {
+                $service = new SociedadAnonimaService();
+                return $service->getPrivateFolderUrl($this->nombre);
+            }),
+            'url_carpeta_apoderado' => $this->when($this->estado_evaluacion == 'Rechazado por escribano-area-legales', function () {
+                $service = new SociedadAnonimaService();
                 return $service->getPublicFolderUrl($this->nombre);
             }),
+            'socios' => $this->socios,
+            'estados' => Estado::collection($this->estados->sortBy('pais')),
         ];
     }
 }
