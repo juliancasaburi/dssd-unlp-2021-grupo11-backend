@@ -14,6 +14,7 @@ use App\Helpers\EstampilladoHelper;
 use PDF;
 use App\Http\Resources\SociedadAnonima as SociedadAnonimaResource;
 use App\Http\Resources\SociedadAnonimaCollection;
+use Exception;
 
 class SociedadAnonimaController extends Controller
 {
@@ -44,11 +45,17 @@ class SociedadAnonimaController extends Controller
      */
     public function infoPublicaSA(SociedadAnonimaService $service, $numeroHash)
     {
-        $pdfContents = $service->getPublicPDFContents($numeroHash);
-        return response($pdfContents, 200, [
-            "Content-type"        => "application/pdf",
-            "Content-Disposition" => "attachment; filename=info_publica_{$numeroHash}.pdf",
-        ]);
+        try
+        {
+            $pdfContents = $service->getPublicPDFContents($numeroHash);
+            return response($pdfContents, 200, [
+                "Content-type"        => "application/pdf",
+                "Content-Disposition" => "attachment; filename=info_publica_{$numeroHash}.pdf",
+            ]);
+        }
+        catch (Exception $e){
+            return response()->json("No existe la Sociedad Anonima con numero de hash {$numeroHash}", 404);
+        }
     }
 
     /**
