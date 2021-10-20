@@ -12,7 +12,7 @@
         <img src="data:image/png;base64, {{ $qr }}"/>
     <div>
     <h1>Nombre: {{ $nombre }}</h1>
-    <h1>Fecha de creación: {{ $fechaCreacion }}</h1>
+    <h1>Fecha de creación: {{ $fechaCreacion->format('d/m/Y') }}</h1>
     <h1>Socios</h1>
     @foreach ($socios as $socio)
         @if ($socio->id === $apoderado_id)
