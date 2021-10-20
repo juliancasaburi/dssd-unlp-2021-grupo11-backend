@@ -45,15 +45,13 @@ class SociedadAnonimaController extends Controller
      */
     public function infoPublicaSA(SociedadAnonimaService $service, $numeroHash)
     {
-        try
-        {
+        try {
             $pdfContents = $service->getPublicPDFContents($numeroHash);
             return response($pdfContents, 200, [
                 "Content-type"        => "application/pdf",
                 "Content-Disposition" => "attachment; filename=info_publica_{$numeroHash}.pdf",
             ]);
-        }
-        catch (Exception $e){
+        } catch (Exception $e) {
             return response()->json("No existe la Sociedad Anonima con numero de hash {$numeroHash}", 404);
         }
     }
@@ -299,7 +297,7 @@ class SociedadAnonimaController extends Controller
         if ($request->input('aprobado') == "true") {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
             // Setear numero_expediente
-            if ($rol == "empleado-mesa-de-entradas"){
+            if ($rol == "empleado-mesa-de-entradas") {
                 $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
                 $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
             }
@@ -308,7 +306,7 @@ class SociedadAnonimaController extends Controller
         }
 
         if (str_contains($rol, "escribano")) {
-            dispatch(function () use ($sociedadAnonima, $user, $service, $bonitaProcessHelper, $jsessionid, $xBonitaAPIToken, $bonitaCaseId, $nuevoEstadoEvaluacion) {
+            dispatch(function () use ($sociedadAnonima, $user, $service, $bonitaProcessHelper, $bonitaCaseId, $nuevoEstadoEvaluacion) {
                 // Solicitar estampillado y setear numero_hash
                 $estampilladoHelper = new EstampilladoHelper();
                 $escribanoCredentials = [
@@ -319,9 +317,9 @@ class SociedadAnonimaController extends Controller
 
                 $estatutoContents = $service->getEstatutoContents($sociedadAnonima->nombre);
                 $estampilladoResponse = $estampilladoHelper->solicitarEstampillado(
-                    $loginResponse["auth"]["access_token"], 
+                    $loginResponse["auth"]["access_token"],
                     $estatutoContents,
-                    $service->getEstatutoFileName($sociedadAnonima->nombre), 
+                    $service->getEstatutoFileName($sociedadAnonima->nombre),
                     $sociedadAnonima->numero_expediente
                 );
 
@@ -352,18 +350,32 @@ class SociedadAnonimaController extends Controller
                     $sociedadAnonima->nombre
                 );
 
+                $urlHelper = new URLHelper();
+                $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
+
+                $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
+                    'username' => config('services.bonita.admin_user'),
+                    'password' => config('services.bonita.admin_password'),
+                    'redirect' => 'false',
+                ]);
+                if ($bonitaLoginResponse->status() == 401)
+                    throw new Exception();
+
+                $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
+                $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
+
                 // numero_hash
                 $sociedadAnonima->numero_hash = $numeroHash;
                 $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
-
                 // estado_evaluacion
                 $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+                
                 // Actualizar la SociedadAnonima
                 $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
                 $sociedadAnonima->save();
             });
         }
-        
+
         // Completar la tarea en Bonita
         $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
 
