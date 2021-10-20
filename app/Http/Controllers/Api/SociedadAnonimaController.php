@@ -292,66 +292,73 @@ class SociedadAnonimaController extends Controller
         if ($request->input('aprobado') == "true") {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
             // Setear numero_expediente
-            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
-            $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
+            if ($rol == "empleado-mesa-de-entradas"){
+                $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
+                $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
+            }
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
         }
 
         if (str_contains($rol, "escribano")) {
-            // Solicitar estampillado y setear numero_hash
-            $estampilladoHelper = new EstampilladoHelper();
-            $escribanoCredentials = [
-                "email" => $user->email,
-                "password" => 'grupo11'
-            ];
-            $loginResponse = $estampilladoHelper->login($escribanoCredentials);
-            $estatutoContents = $service->getEstatutoContents($sociedadAnonima->nombre);
-            $estampilladoResponse = $estampilladoHelper->solicitarEstampillado(
-                $loginResponse["auth"]["access_token"], 
-                $estatutoContents,
-                $service->getEstatutoFileName($sociedadAnonima->nombre), 
-                $sociedadAnonima->numero_expediente
-            );
-            $numeroHash = $estampilladoResponse["numero_hash"];
-            $image = str_replace('data:image/png;base64,', '', $estampilladoResponse["qr"]);
-            $qr = str_replace(' ', '+', $image);
-            $qr = base64_decode($qr);
+            dispatch(function () use ($sociedadAnonima, $user, $service, $bonitaProcessHelper, $jsessionid, $xBonitaAPIToken, $bonitaCaseId, $nuevoEstadoEvaluacion) {
+                // Solicitar estampillado y setear numero_hash
+                $estampilladoHelper = new EstampilladoHelper();
+                $escribanoCredentials = [
+                    "email" => $user->email,
+                    "password" => 'grupo11'
+                ];
+                $loginResponse = $estampilladoHelper->login($escribanoCredentials);
 
-            $sociedadAnonima->numero_hash = $numeroHash;
-            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
+                $estatutoContents = $service->getEstatutoContents($sociedadAnonima->nombre);
+                $estampilladoResponse = $estampilladoHelper->solicitarEstampillado(
+                    $loginResponse["auth"]["access_token"], 
+                    $estatutoContents,
+                    $service->getEstatutoFileName($sociedadAnonima->nombre), 
+                    $sociedadAnonima->numero_expediente
+                );
 
-            /* Guardar estatuto, pdf que contiene la información publica (Nombre, fecha de creación y socios) y el QR */
-            // TODO: agregar la imagen QR dentro del pdf generado.
-            $data = [
-                "nombre" => $sociedadAnonima->nombre,
-                "fechaCreacion" => $sociedadAnonima->fecha_creacion,
-                "socios" => $sociedadAnonima->socios()->get(),
-                "apoderado_id" => $sociedadAnonima->apoderado_id,
-                "qr" => $estampilladoResponse["qr"],
-            ];
-            $pdf = PDF::loadView('pdf.infoPublicaSA', $data);
+                $numeroHash = $estampilladoResponse["numero_hash"];
 
-            // Store files
-            $service->copyEstatutoToPublico($sociedadAnonima->nombre);
-            $service->storePDF(
-                $pdf->download()->getOriginalContent(),
-                $sociedadAnonima->nombre
-            );
-            $service->storeQR(
-                $qr,
-                $sociedadAnonima->nombre
-            );
+                $image = str_replace('data:image/png;base64,', '', $estampilladoResponse["qr"]);
+                $qr = str_replace(' ', '+', $image);
+                $qr = base64_decode($qr);
+
+                /* Guardar estatuto, pdf que contiene la información publica (Nombre, fecha de creación y socios) y el QR */
+                $data = [
+                    "nombre" => $sociedadAnonima->nombre,
+                    "fechaCreacion" => $sociedadAnonima->fecha_creacion,
+                    "socios" => $sociedadAnonima->socios()->get(),
+                    "apoderado_id" => $sociedadAnonima->apoderado_id,
+                    "qr" => $estampilladoResponse["qr"],
+                ];
+                $pdf = PDF::loadView('pdf.infoPublicaSA', $data);
+
+                // Store files
+                $service->copyEstatutoToPublico($sociedadAnonima->nombre);
+                $service->storePDF(
+                    $pdf->download()->getOriginalContent(),
+                    $sociedadAnonima->nombre
+                );
+                $service->storeQR(
+                    $qr,
+                    $sociedadAnonima->nombre
+                );
+
+                // numero_hash
+                $sociedadAnonima->numero_hash = $numeroHash;
+                $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
+
+                // estado_evaluacion
+                $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+                // Actualizar la SociedadAnonima
+                $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+                $sociedadAnonima->save();
+            });
         }
-
-        // estado_evaluacion
-        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+        
         // Completar la tarea en Bonita
         $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
-        // Actualizar la SociedadAnonima
-        $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
-
-        $sociedadAnonima->save();
 
         return response()->json("Tarea aprobada/rechazada", 200);
     }
