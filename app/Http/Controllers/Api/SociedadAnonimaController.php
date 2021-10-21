@@ -298,12 +298,14 @@ class SociedadAnonimaController extends Controller
             // Setear numero_expediente
             if ($rol == "empleado-mesa-de-entradas") {
                 $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
+                $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
                 $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
                 $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
                 $sociedadAnonima->save();
             }
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
             $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
             $sociedadAnonima->save();
         }
