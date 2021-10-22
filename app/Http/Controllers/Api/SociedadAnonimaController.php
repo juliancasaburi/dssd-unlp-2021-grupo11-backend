@@ -304,15 +304,14 @@ class SociedadAnonimaController extends Controller
                 $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
                 $sociedadAnonima->save();
             }
+            else {
+                ProcessAprobacionSA::dispatch($sociedadAnonima, $user, $bonitaCaseId, $nuevoEstadoEvaluacion);
+            }
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
             $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
             $sociedadAnonima->save();
-        }
-
-        if (str_contains($rol, "escribano")) {
-            ProcessAprobacionSA::dispatch($sociedadAnonima, $user, $bonitaCaseId, $nuevoEstadoEvaluacion);
         }
 
         // Completar la tarea en Bonita
