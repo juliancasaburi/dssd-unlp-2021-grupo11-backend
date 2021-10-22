@@ -44,11 +44,12 @@ class SociedadAnonimaController extends Controller
      */
     public function infoPublicaSA(SociedadAnonimaService $service, $numeroHash)
     {
+        $nombreSA = SociedadAnonima::where('numero_hash', $numeroHash)->value('nombre');
         try {
             $pdfContents = $service->getPublicPDFContents($numeroHash);
             return response($pdfContents, 200, [
                 "Content-type"        => "application/pdf",
-                "Content-Disposition" => "attachment; filename=info_publica_{$numeroHash}.pdf",
+                "Content-Disposition" => "attachment; filename=info_publica_{$nombreSA}.pdf",
             ]);
         } catch (Exception $e) {
             return response()->json("No existe la Sociedad Anonima con numero de hash {$numeroHash}", 404);
