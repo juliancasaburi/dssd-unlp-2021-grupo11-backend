@@ -148,6 +148,31 @@
                 }
             }
         },
+        "/api/sa/{numeroHash}": {
+            "get": {
+                "tags": [
+                    "sociedadAnonima-publico"
+                ],
+                "summary": "infoPublicaSA",
+                "description": "Obtener el pdf con la información publica de la SociedadAnonima.",
+                "operationId": "infoPublicaSA",
+                "parameters": [
+                    {
+                        "name": "numeroHash",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Retorna pdf"
+                    }
+                }
+            }
+        },
         "/api/sociedadesAnonimas": {
             "get": {
                 "tags": [

@@ -17,6 +17,9 @@ use App\Http\Controllers\Api\TaskController;
 |
 */
 
+/* Info pública S.A. */
+Route::get('/sa/{numeroHash}', [SociedadAnonimaController::class, 'infoPublicaSA']);
+
 /* Auth */
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);

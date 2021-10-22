@@ -3,18 +3,59 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Helpers\BonitaProcessHelper;
-use App\Services\SociedadAnonimaService;
-use App\Helpers\BonitaTaskHelper;
-use App\Models\SociedadAnonima;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Models\SociedadAnonima;
+use App\Services\SociedadAnonimaService;
+use App\Helpers\BonitaProcessHelper;
+use App\Helpers\BonitaTaskHelper;
 use App\Http\Resources\SociedadAnonima as SociedadAnonimaResource;
 use App\Http\Resources\SociedadAnonimaCollection;
+use Exception;
+use App\Jobs\ProcessAprobacionSA;
 
 class SociedadAnonimaController extends Controller
 {
+    /**
+     * Obtener el pdf con la información publica de la SociedadAnonima.
+     *
+     * @OA\Get(
+     *    path="/api/sa/{numeroHash}",
+     *    summary="infoPublicaSA",
+     *    description="Obtener el pdf con la información publica de la SociedadAnonima.",
+     *    operationId="infoPublicaSA",
+     *    tags={"sociedadAnonima-publico"},
+     *    @OA\Parameter(
+     *         name="numeroHash",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Retorna pdf",
+     *    ),
+     * )
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function infoPublicaSA(SociedadAnonimaService $service, $numeroHash)
+    {
+        $nombreSA = SociedadAnonima::where('numero_hash', $numeroHash)->value('nombre');
+        try {
+            $pdfContents = $service->getPublicPDFContents($numeroHash);
+            return response($pdfContents, 200, [
+                "Content-type"        => "application/pdf",
+                "Content-Disposition" => "attachment; filename=info_publica_{$nombreSA}.pdf",
+            ]);
+        } catch (Exception $e) {
+            return response()->json("No existe la Sociedad Anonima con numero de hash {$numeroHash}", 404);
+        }
+    }
+
     /**
      * Obtener las sociedad anónimas registradas por el usuario actual.
      *
@@ -248,25 +289,33 @@ class SociedadAnonimaController extends Controller
         $bonitaCaseId = $response["caseId"];
         $sociedadAnonima = $service->getSociedadAnonimaByCaseId($bonitaCaseId);
 
-        $rol = auth()->user()->getRoleNames()->first();
+        $user = auth()->user();
+        $rol = $user->getRoleNames()->first();
         $nuevoEstadoEvaluacion = '';
         $bonitaProcessHelper = new BonitaProcessHelper();
 
         if ($request->input('aprobado') == "true") {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
             // Setear numero_expediente
-            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
+            if ($rol == "empleado-mesa-de-entradas") {
+                $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
+                $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+                $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
+                $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+                $sociedadAnonima->save();
+            }
+            else {
+                ProcessAprobacionSA::dispatch($sociedadAnonima, $user, $bonitaCaseId, $nuevoEstadoEvaluacion);
+            }
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
+            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+            $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+            $sociedadAnonima->save();
         }
 
-        // estado_evaluacion
-        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
         // Completar la tarea en Bonita
         $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
-        // Actualizar la SociedadAnonima
-        $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
-        $sociedadAnonima->save();
 
         return response()->json("Tarea aprobada/rechazada", 200);
     }
@@ -488,7 +537,7 @@ class SociedadAnonimaController extends Controller
             $bonitaProcessHelper = new BonitaProcessHelper();
             // estado_evaluacion
             $bonitaCaseId = $sociedadAnonima->bonita_case_id;
-            $nuevoEstadoEvaluacion = "Aprobado por empleado-mesa-de-entradas";
+            $nuevoEstadoEvaluacion = "Estatuto corregido por apoderado";
             $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
             $sociedadAnonima->save();
             $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\SociedadAnonimaCollection;
 use App\Models\Continente;
 use App\Models\Estado;
 use App\Models\Pais;
@@ -30,25 +31,71 @@ class SociedadAnonimaService
         return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
     }
 
-    private function getSociedadFolderPath($nombreSociedad)
+    public function getPublicFolderUrl(string $nombreSociedad)
     {
-        return "{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}/";
+        $metaData = Storage::disk('google')->getDriver()->getAdapter()->getMetaData("{$this->getPublicFolderPathFromConfig()}/{$nombreSociedad}");
+        return "https://drive.google.com/drive/folders" . $metaData["virtual_path"];
+    }
+
+    private function getSociedadFolderPath($nombreSociedad, $private = true)
+    {
+        if ($private)
+            return "{$this->getPrivateFolderPathFromConfig()}/{$nombreSociedad}/";
+        else
+            return "{$this->getPublicFolderPathFromConfig()}/{$nombreSociedad}/";
     }
 
     private function storeEstatutoFile($archivoEstatuto, $nombreSociedad)
     {
 
-        $newFolderPath = $this->getSociedadFolderPath($nombreSociedad) . Carbon::now('GMT-3')->format('d-m-y-H-i');
-        $archivoEstatuto->storeAs($newFolderPath, "estatuto_{$nombreSociedad}.{$archivoEstatuto->extension()}", 'google');
+        $folderPath = $this->getSociedadFolderPath($nombreSociedad) . Carbon::now('GMT-3')->format('d-m-y-H-i');
+        $archivoEstatuto->storeAs($folderPath, "estatuto_{$nombreSociedad}.{$archivoEstatuto->extension()}", 'google');
     }
 
-    private function createSociedadFolder($nombreSociedad)
+    private function createSociedadFolder($nombreSociedad, $private = true)
     {
         $config = new Config();
-        $folderPath = $this->getSociedadFolderPath($nombreSociedad);
+        if ($private)
+            $folderPath = $this->getSociedadFolderPath($nombreSociedad);
+        else
+            $folderPath = $this->getSociedadFolderPath($nombreSociedad, false);
 
         Storage::disk('google')->getDriver()->getAdapter()->createDir($folderPath, $config);
         Storage::disk('google')->getDriver()->getAdapter()->setVisibility($folderPath, "public");
+    }
+
+    private function storePDFFile($pdf, $nombreSociedad)
+    {
+        $folderPath = $this->getSociedadFolderPath($nombreSociedad, false);
+        Storage::disk('google')->put($folderPath."info_publica_{$nombreSociedad}.pdf", $pdf);
+    }
+
+    private function storeQRFile($qr, $nombreSociedad)
+    {
+        $folderPath = $this->getSociedadFolderPath($nombreSociedad, false);
+        Storage::disk('google')->put($folderPath."qr_{$nombreSociedad}.png", $qr);
+    }
+
+    private function getEstatutoFileData($nombreSociedad){
+        $newestFolderData = last(Storage::disk('google')->getDriver()->getAdapter()->listContents($this->getSociedadFolderPath($nombreSociedad, true), false));
+        return last(Storage::disk('google')->getDriver()->getAdapter()->listContents($newestFolderData["path"], false));
+    }
+
+    public function getEstatutoFileName($nombreSociedad){
+        $estatutoFileData = $this->getEstatutoFileData($nombreSociedad);
+        return $estatutoFileData["filename"] . "." . $estatutoFileData["extension"];
+    }
+
+    public function getEstatutoContents($nombreSociedad)
+    {
+        $estatutoFileData = $this->getEstatutoFileData($nombreSociedad);
+        return Storage::disk('google')->getDriver()->getAdapter()->read("{$estatutoFileData["path"]}")['contents'];
+    }
+
+    public function getPublicPDFContents($numeroHash)
+    {
+        $nombreSociedad = SociedadAnonima::where('numero_hash', $numeroHash)->first()->nombre;
+        return Storage::disk('google')->getDriver()->getAdapter()->read($this->getSociedadFolderPath($nombreSociedad, false) . "info_publica_{$nombreSociedad}.pdf")['contents'];
     }
 
     public function storeNewSociedadAnonima(
@@ -95,6 +142,26 @@ class SociedadAnonimaService
         $sociedadAnonima->save();
     }
 
+    public function storeQR(
+        $qr,
+        $nombreSociedad
+    ) {
+        $this->storeQRFile($qr, $nombreSociedad);
+    }
+
+    public function storePDF(
+        $pdf,
+        $nombreSociedad
+    ) {
+        $this->storePDFFile($pdf, $nombreSociedad);
+    }
+
+    public function copyEstatutoToPublico($nombreSociedad) {
+        $estatutoFileData = $this->getEstatutoFileData($nombreSociedad);
+        $this->createSociedadFolder($nombreSociedad, false);
+        Storage::disk('google')->getDriver()->getAdapter()->copy($estatutoFileData["path"], $this->getSociedadFolderPath($nombreSociedad, false)."/estatuto_{$nombreSociedad}.{$estatutoFileData["extension"]}");
+    }
+    
     public function storeEstados(
         SociedadAnonima $sociedadAnonima,
         array $paisesEstados
@@ -172,6 +239,11 @@ class SociedadAnonimaService
     public function getSociedadAnonimaWithSociosAndEstadosById(int $id)
     {
         return SociedadAnonima::with(['socios', 'estados'])->find($id);
+    }
+
+    public function getSociedadAnonimaWithSociosByNumeroHash(string $numeroHash)
+    {
+        return SociedadAnonima::with('socios')->where('numero_hash', $numeroHash)->first();
     }
 
     public function getSociedadAnonimaWithSociosAndEstadosByCaseId(int $bonitaCaseId)

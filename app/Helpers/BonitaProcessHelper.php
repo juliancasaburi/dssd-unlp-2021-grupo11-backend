@@ -4,7 +4,6 @@ namespace App\Helpers;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use GuzzleHttp\Client as GuzzleClient;
 use App\Helpers\URLHelper;
 use App\Helpers\BonitaRequestHelper;
 
