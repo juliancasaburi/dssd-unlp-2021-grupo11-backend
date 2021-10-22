@@ -26,6 +26,8 @@ class SociedadAnonima extends JsonResource
             'email_apoderado' => $this->email_apoderado,
             'estado_evaluacion' => $this->estado_evaluacion,
             'apoderado_id' => $this->apoderado_id,
+            'numero_expediente' => $this->numero_expediente,
+            'numero_hash' => $this->numero_hash,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'url_carpeta_estatuto' => $this->when(Auth::user()->getRoleNames()->first() == 'escribano-area-legales', function () {
