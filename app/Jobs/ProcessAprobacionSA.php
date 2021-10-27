@@ -131,8 +131,6 @@ class ProcessAprobacionSA implements ShouldQueue
         // numero_hash
         $this->sociedadAnonima->numero_hash = $numeroHash;
         $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $this->bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
-        // estado_evaluacion
-        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $this->bonitaCaseId, "estado_evaluacion", "java.lang.String", $this->nuevoEstadoEvaluacion);
 
         // Actualizar la SociedadAnonima
         $this->sociedadAnonima->estado_evaluacion = $this->nuevoEstadoEvaluacion;
