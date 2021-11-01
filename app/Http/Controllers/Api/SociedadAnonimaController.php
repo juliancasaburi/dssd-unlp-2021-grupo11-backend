@@ -14,6 +14,7 @@ use App\Http\Resources\SociedadAnonima as SociedadAnonimaResource;
 use App\Http\Resources\SociedadAnonimaCollection;
 use Exception;
 use App\Jobs\ProcessAprobacionSA;
+use Illuminate\Support\Facades\DB;
 
 class SociedadAnonimaController extends Controller
 {
@@ -715,8 +716,13 @@ class SociedadAnonimaController extends Controller
 
         try {
             $sa = SociedadAnonima::where('nombre', $nombreSociedad)->first();
-            $sa->estado_evaluacion = "Expirado";
-            $sa->save();
+
+            DB::table('sociedades_anonimas_estados')
+             ->where('sociedad_anonima_id', $sa->id)
+             ->delete();
+
+            $sa->delete();
+
             return response()->json("Sociedad Actualizada.", 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json("No existe la Sociedad Anonima con nombre {$nombreSociedad}", 404);
