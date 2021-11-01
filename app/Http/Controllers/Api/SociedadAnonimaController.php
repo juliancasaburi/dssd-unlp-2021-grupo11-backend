@@ -722,4 +722,79 @@ class SociedadAnonimaController extends Controller
             return response()->json("No existe la Sociedad Anonima con nombre {$nombreSociedad}", 404);
         }
     }
+
+    /**
+     * Marcar como finalizada la tarea de creación de carpeta física.
+     *
+     * @OA\Post(
+     *    path="/api/carpetaFisica/{taskId}",
+     *    summary="Sociedad anonima",
+     *    description="Marcar como finalizada la tarea de creación de carpeta física",
+     *    operationId="carpetaFisicaFinalizada",
+     *    tags={"sociedadAnonima-empleado"},
+     *    security={{ "apiAuth": {} }},
+     *    @OA\Parameter(
+     *         name="taskId",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Tarea marcada como finalizada exitosamente.",
+     *       @OA\JsonContent(
+     *          example="Tarea marcada como finalizada exitosamente."
+     *       )
+     *    ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized"
+     *    ),
+     *    @OA\Response(
+     *       response=403,
+     *       description="No puedes realizar esta tarea",
+     *       @OA\JsonContent(
+     *          example="No puedes realizar esta tarea."
+     *       )
+     *    ),
+     *    @OA\Response(
+     *       response=500,
+     *       description="500 internal server error",
+     *       @OA\JsonContent(
+     *          example="500 internal server error"
+     *       )
+     *    ),
+     * ) 
+     * 
+     * @param  \Illuminate\Http\Request $request
+     * @param int $taskId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function carpetaFisicaFinalizada(Request $request, SociedadAnonimaService $service, $taskId)
+    {
+        $jsessionid = $request->cookie('JSESSIONID');
+        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+
+        $bonitaTaskHelper = new BonitaTaskHelper();
+        $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
+
+        if ($response["state"] != "ready" or $response["assigned_id"] != auth()->user()->bonita_user_id)
+            return response()->json("No puedes realizar esta tarea.", 403);
+
+        $bonitaCaseId = $response["caseId"];
+        $sociedadAnonima = $service->getSociedadAnonimaByCaseId($bonitaCaseId);
+
+        // estado_evaluacion
+        $nuevoEstadoEvaluacion = 'Sociedad registrada';
+        $bonitaProcessHelper = new BonitaProcessHelper();
+        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+        $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+        $sociedadAnonima->save();
+        // Completar la tarea en Bonita
+        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
+
+        return response()->json("Tarea marcada como finalizada exitosamente.", 200);
+    }
 }
