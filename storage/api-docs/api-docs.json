@@ -554,6 +554,31 @@
                 ]
             }
         },
+        "/api/expirarSA/{nombreSociedad}": {
+            "get": {
+                "tags": [
+                    "sociedadAnonima-bonita"
+                ],
+                "summary": "expirarSA",
+                "description": "Expirar una S.A al finalizar el plazo de subsanación.",
+                "operationId": "expirarSA",
+                "parameters": [
+                    {
+                        "name": "nombreSociedad",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Se actualizó el estado de la sociedad."
+                    }
+                }
+            }
+        },
         "/api/availableEmployeeTasks": {
             "get": {
                 "tags": [
