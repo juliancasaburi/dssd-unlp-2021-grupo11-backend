@@ -302,8 +302,7 @@ class SociedadAnonimaController extends Controller
                 $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
                 $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
                 $sociedadAnonima->save();
-            }
-            else {
+            } else {
                 ProcessAprobacionSA::dispatch($sociedadAnonima, $user, $bonitaCaseId, $nuevoEstadoEvaluacion);
             }
         } else {
@@ -670,6 +669,57 @@ class SociedadAnonimaController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Expirar una S.A al finalizar el plazo de subsanación.
+     *
+     * @OA\Get(
+     *    path="/api/expirarSA/{nombreSociedad}",
+     *    summary="expirarSA",
+     *    description="Expirar una S.A al finalizar el plazo de subsanación.",
+     *    operationId="expirarSA",
+     *    tags={"sociedadAnonima-bonita"},
+     *    @OA\Parameter(
+     *         name="nombreSociedad",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="string"
+     *         )
+     *    ),
+     *    @OA\Response(
+     *       response=200,
+     *       description="Se actualizó el estado de la sociedad.",
+     *    ),
+     * )
+     * 
+     * @param  \Illuminate\Http\Request $request
+     * @param  string $nombreSociedad
+     * @return \Illuminate\Http\Response
+     */
+    public function expirarSA(Request $request, $nombreSociedad)
+    {
+        $credentials = $request->only(['email', 'password']);
+
+        if (!$token = auth('api')->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $user = auth('api')->user();
+
+        if (!$user->hasRole('admin')) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        try {
+            $sa = SociedadAnonima::where('nombre', $nombreSociedad)->first();
+            $sa->estado_evaluacion = "Expirado";
+            $sa->save();
+            return response()->json("Sociedad Actualizada.", 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json("No existe la Sociedad Anonima con nombre {$nombreSociedad}", 404);
         }
     }
 }
