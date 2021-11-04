@@ -68,7 +68,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Login",
+                "summary": "Logout",
                 "description": "Logout",
                 "operationId": "authLogout",
                 "responses": {
