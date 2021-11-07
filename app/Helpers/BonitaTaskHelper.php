@@ -124,17 +124,25 @@ class BonitaTaskHelper
     public function availableTasks($jsessionid, $xBonitaAPIToken, $userRoles)
     {
         try {
-            $taskName = "Revisión de la Solicitud";
-            if ($userRoles->contains("escribano-area-legales"))
-                $taskName = "Evaluación de estatuto";
-
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
-
             $bonitaRequestHelper = new BonitaRequestHelper();
             $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $urlHelper = new URLHelper();
+            $response = '';
 
-            $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
+            if ($userRoles->contains("escribano-area-legales")){
+                $taskName = "Evaluación de estatuto";
+                $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
+                $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
+            }
+            else{
+                $taskNames = ["Revisión de la Solicitud", "Creación de carpeta física"];
+                $taskData = [];
+                foreach ($taskNames as $taskName){
+                    $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
+                    $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
+                    array_merge($taskData, $response->json());
+                }          
+            }
 
             return $response->json();
         } catch (ConnectionException $e) {
