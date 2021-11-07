@@ -13,31 +13,6 @@ use Illuminate\Support\Arr;
 class TaskController extends Controller
 {
     /**
-     * Primera tarea disponible para el usuario autenticado.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function nextTask(Request $request)
-    {
-        try {
-            $jsessionid = $request->cookie('JSESSIONID');
-            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-
-            $bonitaTaskHelper = new BonitaTaskHelper();
-            $response = $bonitaTaskHelper->nextTask($jsessionid, $xBonitaAPIToken, auth()->user()->getRoleNames());
-
-            $responseData = head($response);
-            $sociedad = SociedadAnonima::with(['apoderado', 'socios'])->where('bonita_case_id', $responseData["caseId"])->first();
-            $responseData["datosSociedad"] = $sociedad;
-
-            return response()->json($responseData, 200);
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
-    }
-
-    /**
      * Tareas disponibles para el usuario autenticado.
      *
      * @OA\Get(
