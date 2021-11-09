@@ -309,6 +309,7 @@ class SociedadAnonimaController extends Controller
         } else {
             $nuevoEstadoEvaluacion = "Rechazado por {$rol}";
             $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
+            $rol == "empleado-mesa-de-entradas" ? $sociedadAnonima->cantidad_rechazos_mesa_entradas += 1 : $sociedadAnonima->cantidad_rechazos_area_legales += 1;
             $sociedadAnonima->save();
         }
 
