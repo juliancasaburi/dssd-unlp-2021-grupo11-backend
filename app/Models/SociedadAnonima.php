@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Wildside\Userstamps\Userstamps;
 use App\Models\Socio;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SociedadAnonima extends Model
 {
-    use Userstamps;
+    use SoftDeletes, Userstamps;
 
     /**
      * The table associated with the model.

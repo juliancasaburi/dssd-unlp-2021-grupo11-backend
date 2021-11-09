@@ -29,6 +29,7 @@ class CreateSociedadesAnonimasTable extends Migration
             $table->integer('cantidad_rechazos_area_legales')->default(0);
             $table->unsignedBigInteger('apoderado_id')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             // User stamps
             $table->unsignedBigInteger('created_by')->nullable();
