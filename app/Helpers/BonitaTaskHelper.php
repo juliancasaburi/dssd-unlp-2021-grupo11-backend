@@ -93,7 +93,7 @@ class BonitaTaskHelper
             if ($userRoles->contains("escribano-area-legales")){
                 $taskName = "Evaluación de estatuto";
                 $url = URLHelper::getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
-                $taskData = Http::withHeaders($bonitaAuthHeaders)->get($url);
+                $taskData = Http::withHeaders($bonitaAuthHeaders)->get($url)->json();
             }
             else{
                 $taskNames = ["Revisión de la Solicitud", "Creación de carpeta física"];
