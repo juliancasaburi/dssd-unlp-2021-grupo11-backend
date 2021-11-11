@@ -9,9 +9,9 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Helpers\URLHelper;
-use App\Helpers\BonitaMembershipHelper;
 use App\Helpers\BonitaUserHelper;
 use App\Helpers\BonitaAdminLoginHelper;
+use App\Helpers\BonitaMembershipHelper;
 use App\Http\Resources\User as UserResource;
 
 class AuthController extends Controller
@@ -76,8 +76,8 @@ class AuthController extends Controller
         }
 
         try {
-            $urlHelper = new URLHelper();
-            $apiUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
+            
+            $apiUrl = URLHelper::getBonitaEndpointURL('/loginservice');
 
             $response = Http::asForm()->post($apiUrl, [
                 'username' => $credentials["email"],
@@ -120,8 +120,8 @@ class AuthController extends Controller
     public function logout()
     {
         try {
-            $urlHelper = new URLHelper();
-            $apiUrl = $urlHelper->getBonitaEndpointURL('/logoutservice');
+            
+            $apiUrl = URLHelper::getBonitaEndpointURL('/logoutservice');
 
             $response = Http::post($apiUrl);
 
@@ -239,13 +239,11 @@ class AuthController extends Controller
             $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
             $xBonitaAPIToken = $bonitaAdminLoginResponse->cookies()->toArray()[2]['Value'];
 
-            $bonitaMembershipHelper = new BonitaMembershipHelper();
-            $apoderadoGroupId = $bonitaMembershipHelper->groupIdByName($jsessionid, $xBonitaAPIToken, "Apoderado");
-            $apoderadoRoleId = $bonitaMembershipHelper->roleIdByName($jsessionid, $xBonitaAPIToken, "apoderado");
+            $apoderadoGroupId = BonitaMemberShipHelper::groupIdByName($jsessionid, $xBonitaAPIToken, "Apoderado");
+            $apoderadoRoleId = BonitaMemberShipHelper::roleIdByName($jsessionid, $xBonitaAPIToken, "apoderado");
 
             /* Register Bonita User */
-            $bonitaUserHelper = new BonitaUserHelper();
-            $bonitaRegisterResponse = $bonitaUserHelper->registerUser($jsessionid, $xBonitaAPIToken, $validator->validated());
+            $bonitaRegisterResponse = BonitaUserHelper::registerUser($jsessionid, $xBonitaAPIToken, $validator->validated());
             if ($bonitaRegisterResponse->status() != 200)
                 return response()->json($bonitaRegisterResponse->json(), $bonitaRegisterResponse->status());
 
@@ -256,12 +254,12 @@ class AuthController extends Controller
                 "group_id" => $apoderadoGroupId,
                 "role_id" => $apoderadoRoleId,
             ];
-            $bonitaSetUserMembershipResponse = $bonitaUserHelper->setUserMembership($jsessionid, $xBonitaAPIToken, $bonitaMemberShipRequestData);
+            $bonitaSetUserMembershipResponse = BonitaUserHelper::setUserMembership($jsessionid, $xBonitaAPIToken, $bonitaMemberShipRequestData);
             if ($bonitaSetUserMembershipResponse->status() != 200)
                 return response()->json($bonitaSetUserMembershipResponse->json(), $bonitaSetUserMembershipResponse->status());
 
             /* Enable Bonita User */
-            $bonitaEnableUserResponse = $bonitaUserHelper->enableUser($jsessionid, $xBonitaAPIToken, $bonitaRegisterResponse['id']);
+            $bonitaEnableUserResponse = BonitaUserHelper::enableUser($jsessionid, $xBonitaAPIToken, $bonitaRegisterResponse['id']);
             if ($bonitaEnableUserResponse->status() != 200)
                 return response()->json($bonitaEnableUserResponse->json(), $bonitaEnableUserResponse->status());
             $bonitaUserData['enabled'] = "true";

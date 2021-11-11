@@ -202,8 +202,7 @@ class SociedadAnonimaController extends Controller
     {
         $jsessionid = $request->cookie('JSESSIONID');
         $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-        $bonitaTaskHelper = new BonitaTaskHelper();
-        $taskData = head($bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId));
+        $taskData = head(BonitaTaskHelper::tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId));
 
         $user = auth()->user();
         if ($taskData["assigned_id"] != $user->bonita_user_id)
@@ -280,8 +279,7 @@ class SociedadAnonimaController extends Controller
         $jsessionid = $request->cookie('JSESSIONID');
         $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-        $bonitaTaskHelper = new BonitaTaskHelper();
-        $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
+        $response = BonitaTaskHelper::taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
         if ($response["state"] != "ready" or $response["assigned_id"] != auth()->user()->bonita_user_id)
             return response()->json("No puedes aprobar/rechazar esta tarea.", 403);
@@ -293,13 +291,12 @@ class SociedadAnonimaController extends Controller
         $user = auth()->user();
         $rol = $user->getRoleNames()->first();
         $nuevoEstadoEvaluacion = '';
-        $bonitaProcessHelper = new BonitaProcessHelper();
 
         if ($request->input('aprobado') == "true") {
             $nuevoEstadoEvaluacion = "Aprobado por {$rol}";
             // Setear numero_expediente
             if ($rol == "empleado-mesa-de-entradas") {
-                $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
+                BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "numero_expediente", "java.lang.String", $sociedadAnonima->id);
                 $sociedadAnonima->numero_expediente = $sociedadAnonima->id;
                 $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
                 $sociedadAnonima->save();
@@ -314,10 +311,10 @@ class SociedadAnonimaController extends Controller
         }
 
         // estado_evaluacion
-        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+        BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
 
         // Completar la tarea en Bonita
-        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
+        BonitaTaskHelper::executeTask($jsessionid, $xBonitaAPIToken, $taskId);
 
         return response()->json("Tarea aprobada/rechazada", 200);
     }
@@ -437,12 +434,10 @@ class SociedadAnonimaController extends Controller
             /* Se marca la actividad como completada */
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-            $bonitaProcessHelper = new BonitaProcessHelper();
             $bonitaCaseId = $sociedadAnonima->bonita_case_id;
-            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "email_apoderado", "java.lang.String", $request->input('email_apoderado'));
-            $bonitaTaskHelper = new BonitaTaskHelper();
-            $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
+            BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "email_apoderado", "java.lang.String", $request->input('email_apoderado'));
+            $userTasksResponse = BonitaTaskHelper::tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+            BonitaTaskHelper::executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
 
             return response()->json("S.A. actualizada", 200);
         } catch (\Exception $e) {
@@ -535,16 +530,14 @@ class SociedadAnonimaController extends Controller
             /* Se marca la actividad como completada */
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-            $bonitaTaskHelper = new BonitaTaskHelper();
-            $bonitaProcessHelper = new BonitaProcessHelper();
             // estado_evaluacion
             $bonitaCaseId = $sociedadAnonima->bonita_case_id;
             $nuevoEstadoEvaluacion = "Estatuto corregido por apoderado";
             $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
             $sociedadAnonima->save();
-            $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
-            $tasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], true);
+            BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+            $tasksResponse = BonitaTaskHelper::tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+            BonitaTaskHelper::executeTask($jsessionid, $xBonitaAPIToken, head($tasksResponse)["id"], true);
 
             return response()->json("Estatuto actualizado", 200);
         } catch (\Exception $e) {
@@ -629,20 +622,18 @@ class SociedadAnonimaController extends Controller
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
             /* Se crea la instancia (case) del proceso en Bonita y  se asignan variables */
-            $bonitaProcessHelper = new BonitaProcessHelper();
             $caseData = [
                 "nombre_sociedad" => $request->input('nombre'),
                 "email_apoderado" => $request->input('email_apoderado')
             ];
-            $startProcessResponse = $bonitaProcessHelper->startProcessByName($jsessionid, $xBonitaAPIToken, "Registro", $caseData);
+            $startProcessResponse = BonitaProcessHelper::startProcessByName($jsessionid, $xBonitaAPIToken, "Registro", $caseData);
             $bonitaCaseId = $startProcessResponse->original["id"];
 
             /* Se marca la primera actividad como completada */
-            $bonitaTaskHelper = new BonitaTaskHelper();
-            $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+            $userTasksResponse = BonitaTaskHelper::tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
             while (empty($userTasksResponse))
-                $userTasksResponse = $bonitaTaskHelper->tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
-            $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
+                $userTasksResponse = BonitaTaskHelper::tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId);
+            BonitaTaskHelper::executeTask($jsessionid, $xBonitaAPIToken, head($userTasksResponse)["id"], true);
 
             if ($startProcessResponse->status() == 200) {
                 $sociedadAnonima = $service->storeNewSociedadAnonima(
@@ -784,8 +775,7 @@ class SociedadAnonimaController extends Controller
         $jsessionid = $request->cookie('JSESSIONID');
         $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-        $bonitaTaskHelper = new BonitaTaskHelper();
-        $response = $bonitaTaskHelper->taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
+        $response = BonitaTaskHelper::taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
         if ($response["state"] != "ready" or $response["assigned_id"] != auth()->user()->bonita_user_id)
             return response()->json("No puedes realizar esta tarea.", 403);
@@ -795,12 +785,11 @@ class SociedadAnonimaController extends Controller
 
         // estado_evaluacion
         $nuevoEstadoEvaluacion = 'Sociedad registrada';
-        $bonitaProcessHelper = new BonitaProcessHelper();
-        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
+        BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "estado_evaluacion", "java.lang.String", $nuevoEstadoEvaluacion);
         $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
         $sociedadAnonima->save();
         // Completar la tarea en Bonita
-        $bonitaTaskHelper->executeTask($jsessionid, $xBonitaAPIToken, $taskId);
+        BonitaTaskHelper::executeTask($jsessionid, $xBonitaAPIToken, $taskId);
 
         return response()->json("Tarea marcada como finalizada exitosamente.", 200);
     }

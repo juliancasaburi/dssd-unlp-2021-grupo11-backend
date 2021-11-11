@@ -4,8 +4,6 @@ namespace App\Helpers;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use App\Helpers\URLHelper;
-use App\Helpers\BonitaRequestHelper;
 
 class BonitaTaskHelper
 {
@@ -17,14 +15,12 @@ class BonitaTaskHelper
      * @param  int  $bonitaCaseId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId)
+    public static function tasksByCaseId($jsessionid, $xBonitaAPIToken, $bonitaCaseId)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/task?p=0&c=10&f=caseId=' . $bonitaCaseId);
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/task?p=0&c=10&f=caseId=' . $bonitaCaseId);
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
@@ -42,14 +38,12 @@ class BonitaTaskHelper
      * @param  int $taskId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function taskDataById($jsessionid, $xBonitaAPIToken, $taskId)
+    public static function taskDataById($jsessionid, $xBonitaAPIToken, $taskId)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
@@ -67,14 +61,12 @@ class BonitaTaskHelper
      * @param  string $filter
      * @return \Illuminate\Http\JsonResponse
      */
-    public function taskDataFiltered($jsessionid, $xBonitaAPIToken, $filter)
+    public static function taskDataFiltered($jsessionid, $xBonitaAPIToken, $filter)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?{$filter}");
+            $url = URLHelper::getBonitaEndpointURL("/API/bpm/humanTask?{$filter}");
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
@@ -92,23 +84,21 @@ class BonitaTaskHelper
      * @param  Illuminate\Support\Collection $userRoles
      * @return \Illuminate\Http\JsonResponse
      */
-    public function availableTasks($jsessionid, $xBonitaAPIToken, $userRoles)
+    public static function availableTasks($jsessionid, $xBonitaAPIToken, $userRoles)
     {
         try {
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
-            $urlHelper = new URLHelper();
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
             $taskData = [];
 
             if ($userRoles->contains("escribano-area-legales")){
                 $taskName = "Evaluación de estatuto";
-                $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
+                $url = URLHelper::getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
                 $taskData = Http::withHeaders($bonitaAuthHeaders)->get($url);
             }
             else{
                 $taskNames = ["Revisión de la Solicitud", "Creación de carpeta física"];
                 foreach ($taskNames as $taskName){
-                    $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
+                    $url = URLHelper::getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=displayName={$taskName}&f=state=ready&f=assigned_id=0");
                     $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
                     $taskData = array_merge($taskData, $response->json());
                 }          
@@ -128,14 +118,12 @@ class BonitaTaskHelper
      * @param  int $bonitaUserId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function userTasks($jsessionid, $xBonitaAPIToken, $bonitaUserId)
+    public static function userTasks($jsessionid, $xBonitaAPIToken, $bonitaUserId)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=assigned_id={$bonitaUserId}&f=state=ready");
+            $url = URLHelper::getBonitaEndpointURL("/API/bpm/humanTask?p=0&f=assigned_id={$bonitaUserId}&f=state=ready");
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->get($url);
 
@@ -154,14 +142,12 @@ class BonitaTaskHelper
      * @param  array $dataArray
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateTask($jsessionid, $xBonitaAPIToken, $taskId, $dataArray)
+    public static function updateTask($jsessionid, $xBonitaAPIToken, $taskId, $dataArray)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [$dataArray]);
 
@@ -180,17 +166,15 @@ class BonitaTaskHelper
      * @param bool $assign
      * @return \Illuminate\Http\JsonResponse
      */
-    public function executeTask($jsessionid, $xBonitaAPIToken, $taskId, $assign = false)
+    public static function executeTask($jsessionid, $xBonitaAPIToken, $taskId, $assign = false)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/userTask/' . $taskId . '/execution');
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/userTask/' . $taskId . '/execution');
 
             if ($assign == true)
                 $url = $url . '?assign=true';
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->withBody(null, 'application/json')->post($url);
 
@@ -208,14 +192,14 @@ class BonitaTaskHelper
      * @param  int $bonitaUserId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function assignTask($jsessionid, $xBonitaAPIToken, $taskId, $bonitaUserId)
+    public static function assignTask($jsessionid, $xBonitaAPIToken, $taskId, $bonitaUserId)
     {
         try {
             $updateTaskDataArray = [
                 "assigned_id" => $bonitaUserId,
             ];
 
-            $this->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+            Self::updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
@@ -229,14 +213,14 @@ class BonitaTaskHelper
      * @param  int $taskId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function unassignTask($jsessionid, $xBonitaAPIToken, $taskId)
+    public static function unassignTask($jsessionid, $xBonitaAPIToken, $taskId)
     {
         try {
             $updateTaskDataArray = [
                 "assigned_id" => "",
             ];
 
-            $this->updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
+            Self::updateTask($jsessionid, $xBonitaAPIToken, $taskId, $updateTaskDataArray);
         } catch (ConnectionException $e) {
             return response()->json("500 Internal Server Error", 500);
         }
