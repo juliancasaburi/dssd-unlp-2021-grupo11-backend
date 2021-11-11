@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use App\Helpers\URLHelper;
 use App\Models\User;
+use App\Helpers\URLHelper;
 use App\Helpers\BonitaMembershipHelper;
 use App\Helpers\BonitaUserHelper;
+use App\Helpers\BonitaAdminLoginHelper;
 use App\Http\Resources\User as UserResource;
 
 class AuthController extends Controller
@@ -230,19 +231,13 @@ class AuthController extends Controller
         }
 
         try {
-            $urlHelper = new URLHelper();
-            $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
-
-            $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
-                'username' => config('services.bonita.admin_user'),
-                'password' => config('services.bonita.admin_password'),
-                'redirect' => 'false',
-            ]);
-            if ($bonitaLoginResponse->status() == 401)
+            $bonitaAdminLoginHelper = new BonitaAdminLoginHelper();
+            $bonitaAdminLoginResponse = $bonitaAdminLoginHelper->login();
+            if ($bonitaAdminLoginResponse->status() == 401)
                 return response()->json("500 Internal Server Error", 500);
 
-            $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
-            $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
+            $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
+            $xBonitaAPIToken = $bonitaAdminLoginResponse->cookies()->toArray()[2]['Value'];
 
             $bonitaMembershipHelper = new BonitaMembershipHelper();
             $apoderadoGroupId = $bonitaMembershipHelper->groupIdByName($jsessionid, $xBonitaAPIToken, "Apoderado");

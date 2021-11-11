@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Helpers\URLHelper;
 use Illuminate\Support\Facades\Http;
 use App\Helpers\BonitaRequestHelper;
+use App\Helpers\BonitaAdminLoginHelper;
 
 class UserSeeder extends Seeder
 {
@@ -20,16 +21,11 @@ class UserSeeder extends Seeder
     {
         // Bonita users
         $urlHelper = new URLHelper();
-        $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
+        $bonitaAdminLoginHelper = new BonitaAdminLoginHelper();
+        $bonitaAdminLoginResponse = $bonitaAdminLoginHelper->login();
 
-        $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
-            'username' => config('services.bonita.admin_user'),
-            'password' => config('services.bonita.admin_password'),
-            'redirect' => 'false',
-        ]);
-
-        $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
-        $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
+        $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
+        $xBonitaAPIToken = $bonitaAdminLoginResponse->cookies()->toArray()[2]['Value'];
         $bonitaRequestHelper = new BonitaRequestHelper();
         $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
         $apiIdentityUsersUrl = $urlHelper->getBonitaEndpointURL('/API/identity/user?p=0&f=enabled=true');
