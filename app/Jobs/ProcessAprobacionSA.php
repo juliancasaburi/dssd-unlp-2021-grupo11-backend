@@ -12,8 +12,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Helpers\BonitaProcessHelper;
 use App\Helpers\EstampilladoHelper;
 use App\Helpers\URLHelper;
+use App\Helpers\BonitaAdminLoginHelper;
 use App\Services\SociedadAnonimaService;
-use Illuminate\Support\Facades\Http;
 use PDF;
 use Exception;
 
@@ -117,16 +117,13 @@ class ProcessAprobacionSA implements ShouldQueue
         $urlHelper = new URLHelper();
         $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
 
-        $bonitaLoginResponse = Http::asForm()->post($apiLoginUrl, [
-            'username' => config('services.bonita.admin_user'),
-            'password' => config('services.bonita.admin_password'),
-            'redirect' => 'false',
-        ]);
-        if ($bonitaLoginResponse->status() != 204)
+        $bonitaAdminLoginHelper = new BonitaAdminLoginHelper();
+        $bonitaAdminLoginResponse = $bonitaAdminLoginHelper->login();
+        if ($bonitaAdminLoginResponse ->status() != 204)
             throw new Exception();
 
-        $jsessionid = $bonitaLoginResponse->cookies()->toArray()[1]['Value'];
-        $xBonitaAPIToken = $bonitaLoginResponse->cookies()->toArray()[2]['Value'];
+        $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
+        $xBonitaAPIToken = $bonitaAdminLoginResponse->cookies()->toArray()[2]['Value'];
 
         // numero_hash
         $this->sociedadAnonima->numero_hash = $numeroHash;
