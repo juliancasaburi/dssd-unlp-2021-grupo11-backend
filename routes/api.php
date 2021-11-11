@@ -57,4 +57,5 @@ Route::group(['middleware' => ['apiJwt', 'bonitaProtectedRoute', 'employeeOnlyRo
     Route::post('unassignTask/{id}', [TaskController::class, 'unassignTask']);
     Route::get('sociedadAnonimaByCaseId/{id}', [SociedadAnonimaController::class, 'getSociedadAnonimaByCaseId']);
     Route::post('updateSociedadAnonimaStatus/{id}', [SociedadAnonimaController::class, 'updateSociedadAnonimaStatus']);
+    Route::post('carpetaFisica/{id}', [SociedadAnonimaController::class, 'carpetaFisicaFinalizada']);
 });
