@@ -11,7 +11,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Helpers\BonitaProcessHelper;
 use App\Helpers\EstampilladoHelper;
-use App\Helpers\URLHelper;
 use App\Helpers\BonitaAdminLoginHelper;
 use App\Services\SociedadAnonimaService;
 use PDF;
@@ -114,12 +113,9 @@ class ProcessAprobacionSA implements ShouldQueue
             $this->sociedadAnonima->nombre
         );
 
-        $urlHelper = new URLHelper();
-        $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
-
         $bonitaAdminLoginHelper = new BonitaAdminLoginHelper();
         $bonitaAdminLoginResponse = $bonitaAdminLoginHelper->login();
-        if ($bonitaAdminLoginResponse ->status() != 204)
+        if ($bonitaAdminLoginResponse->status() != 204)
             throw new Exception();
 
         $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
