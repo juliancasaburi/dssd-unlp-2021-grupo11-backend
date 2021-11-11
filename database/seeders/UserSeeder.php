@@ -5,10 +5,10 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Carbon\Carbon;
-use App\Helpers\URLHelper;
 use Illuminate\Support\Facades\Http;
-use App\Helpers\BonitaRequestHelper;
 use App\Helpers\BonitaAdminLoginHelper;
+use App\Helpers\BonitaRequestHelper;
+use App\Helpers\URLHelper;
 
 class UserSeeder extends Seeder
 {
@@ -20,15 +20,13 @@ class UserSeeder extends Seeder
     public function run()
     {
         // Bonita users
-        $urlHelper = new URLHelper();
         $bonitaAdminLoginHelper = new BonitaAdminLoginHelper();
         $bonitaAdminLoginResponse = $bonitaAdminLoginHelper->login();
 
         $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
         $xBonitaAPIToken = $bonitaAdminLoginResponse->cookies()->toArray()[2]['Value'];
-        $bonitaRequestHelper = new BonitaRequestHelper();
-        $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
-        $apiIdentityUsersUrl = $urlHelper->getBonitaEndpointURL('/API/identity/user?p=0&f=enabled=true');
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+        $apiIdentityUsersUrl = URLHelper::getBonitaEndpointURL('/API/identity/user?p=0&f=enabled=true');
 
         $users = Http::withHeaders($bonitaAuthHeaders)->get($apiIdentityUsersUrl);
         
@@ -36,14 +34,14 @@ class UserSeeder extends Seeder
             $userData = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
                 'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($urlHelper->getBonitaEndpointURL("/API/identity/user?s={$user['userName']}"));
+            ])->get(URLHelper::getBonitaEndpointURL("/API/identity/user?s={$user['userName']}"));
 
             $userId = head($userData->json())['id'];
 
             $membershipData = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
                 'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get($urlHelper->getBonitaEndpointURL("/API/identity/membership?p=0&c=10&f=user_id={$userId}&d=role_id"));
+            ])->get(URLHelper::getBonitaEndpointURL("/API/identity/membership?p=0&c=10&f=user_id={$userId}&d=role_id"));
 
             if (!empty($membershipData->json())){
                 User::create([

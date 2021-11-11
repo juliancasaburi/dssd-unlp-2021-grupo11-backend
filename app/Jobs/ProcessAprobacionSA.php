@@ -69,18 +69,16 @@ class ProcessAprobacionSA implements ShouldQueue
      */
     public function handle()
     {
-        $bonitaProcessHelper = new BonitaProcessHelper();
         // Solicitar estampillado y setear numero_hash
-        $estampilladoHelper = new EstampilladoHelper();
         $escribanoCredentials = [
             "email" => $this->user->email,
             "password" => 'grupo11'
         ];
-        $loginResponse = $estampilladoHelper->login($escribanoCredentials);
+        $loginResponse = EstampilladoHelper::login($escribanoCredentials);
 
         $service = new SociedadAnonimaService();
 
-        $estampilladoResponse = $estampilladoHelper->solicitarEstampillado(
+        $estampilladoResponse = EstampilladoHelper::solicitarEstampillado(
             $loginResponse["auth"]["access_token"],
             $service->getEstatutoContents($this->sociedadAnonima->nombre),
             $service->getEstatutoFileName($this->sociedadAnonima->nombre),
@@ -123,7 +121,7 @@ class ProcessAprobacionSA implements ShouldQueue
 
         // numero_hash
         $this->sociedadAnonima->numero_hash = $numeroHash;
-        $bonitaProcessHelper->updateCaseVariable($jsessionid, $xBonitaAPIToken, $this->bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
+        BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $this->bonitaCaseId, "numero_hash", "java.lang.String", $numeroHash);
 
         // Actualizar la SociedadAnonima
         $this->sociedadAnonima->estado_evaluacion = $this->nuevoEstadoEvaluacion;

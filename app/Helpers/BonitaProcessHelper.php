@@ -4,8 +4,6 @@ namespace App\Helpers;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use App\Helpers\URLHelper;
-use App\Helpers\BonitaRequestHelper;
 
 class BonitaProcessHelper
 {
@@ -16,11 +14,10 @@ class BonitaProcessHelper
      * @param  string  $name
      * @return \Illuminate\Http\JsonResponse
      */
-    public function processByName($jsessionid, $name)
+    public static function processByName($jsessionid, $name)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process?s=' . $name);
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/process?s=' . $name);
 
             $response = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid,
@@ -43,14 +40,12 @@ class BonitaProcessHelper
      * @param  string  $value
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateCaseVariable($jsessionid, $xBonitaAPIToken, $caseId, $variableName, $type, $value)
+    public static function updateCaseVariable($jsessionid, $xBonitaAPIToken, $caseId, $variableName, $type, $value)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [
                 "type" => $type,
@@ -70,21 +65,19 @@ class BonitaProcessHelper
      * @param  array  $caseData
      * @return \Illuminate\Http\JsonResponse
      */
-    public function startProcessByName($jsessionid, $xBonitaAPIToken, $name, $caseData)
+    public static function startProcessByName($jsessionid, $xBonitaAPIToken, $name, $caseData)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/process?s=' . $name);
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/process?s=' . $name);
 
             $response = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid,
             ])->get($url);
 
             $processId = head($response->json())['id'];
-            $url = $urlHelper->getBonitaEndpointURL('/API/bpm/case');
+            $url = URLHelper::getBonitaEndpointURL('/API/bpm/case');
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
             $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'

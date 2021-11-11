@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Helpers\URLHelper;
 use Illuminate\Support\Facades\Http;
 
 class BonitaAdminLoginHelper
@@ -13,8 +12,7 @@ class BonitaAdminLoginHelper
      */
     public function login()
     {
-        $urlHelper = new URLHelper();
-        $apiLoginUrl = $urlHelper->getBonitaEndpointURL('/loginservice');
+        $apiLoginUrl = URLHelper::getBonitaEndpointURL('/loginservice');
 
         return Http::asForm()->post($apiLoginUrl, [
             'username' => config('services.bonita.admin_user'),
