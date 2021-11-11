@@ -10,7 +10,7 @@ class URLHelper
      * @param  string $endpointName
      * @return string
      */
-    public function getBonitaEndpointURL(string $endpointName)
+    public static function getBonitaEndpointURL(string $endpointName)
     {
         return config('services.bonita.api_url') . $endpointName;
     }
@@ -20,7 +20,7 @@ class URLHelper
      *
      * @return string
      */
-    public function getServicioEstampilladoURL()
+    public static function getServicioEstampilladoURL()
     {
         return config('services.estampillado.endpoint');
     }
@@ -30,7 +30,7 @@ class URLHelper
      *
      * @return string
      */
-    public function getFrontendURL()
+    public static function getFrontendURL()
     {
         return config('services.frontend.endpoint');
     }
