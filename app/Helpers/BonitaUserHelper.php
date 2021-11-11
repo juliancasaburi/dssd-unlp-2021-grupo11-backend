@@ -4,8 +4,6 @@ namespace App\Helpers;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use App\Helpers\URLHelper;
-use App\Helpers\BonitaRequestHelper;
 
 class BonitaUserHelper
 {
@@ -17,14 +15,12 @@ class BonitaUserHelper
      * @param  array $userData
      * @return \Illuminate\Http\JsonResponse
      */
-    public function registerUser($jsessionid, $xBonitaAPIToken, $userData)
+    public static function registerUser($jsessionid, $xBonitaAPIToken, $userData)
     {
         try {
-            $urlHelper = new URLHelper();
-            $bonitaRegisterUserUrl = $urlHelper->getBonitaEndpointURL("/API/identity/user");
+            $bonitaRegisterUserUrl = URLHelper::getBonitaEndpointURL("/API/identity/user");
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
             $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
@@ -57,14 +53,12 @@ class BonitaUserHelper
      * @param  array $data
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setUserMembership($jsessionid, $xBonitaAPIToken, $data)
+    public static function setUserMembership($jsessionid, $xBonitaAPIToken, $data)
     {
         try {
-            $urlHelper = new URLHelper();
-            $bonitaSetUserMembershipUrl = $urlHelper->getBonitaEndpointURL("/API/identity/membership");
+            $bonitaSetUserMembershipUrl = URLHelper::getBonitaEndpointURL("/API/identity/membership");
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
             $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
@@ -92,14 +86,12 @@ class BonitaUserHelper
      * @param  string $bonitaUserId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function enableUser($jsessionid, $xBonitaAPIToken, $bonitaUserId)
+    public static function enableUser($jsessionid, $xBonitaAPIToken, $bonitaUserId)
     {
         try {
-            $urlHelper = new URLHelper();
-            $bonitaEnableUserUrl = $urlHelper->getBonitaEndpointURL("/API/identity/user/{$bonitaUserId}");
+            $bonitaEnableUserUrl = URLHelper::getBonitaEndpointURL("/API/identity/user/{$bonitaUserId}");
 
-            $bonitaRequestHelper = new BonitaRequestHelper();
-            $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
             $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'

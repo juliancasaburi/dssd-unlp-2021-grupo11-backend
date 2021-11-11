@@ -11,7 +11,7 @@ class BonitaRequestHelper
      * @param  string $xBonitaAPIToken
      * @return array
      */
-    public function getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken)
+    public static function getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken)
     {
         return [
             'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,

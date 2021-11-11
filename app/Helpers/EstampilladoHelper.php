@@ -5,7 +5,6 @@ namespace App\Helpers;
 use Illuminate\Http\Client\ConnectionException;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Facades\Http;
-use App\Helpers\URLHelper;
 
 class EstampilladoHelper
 {
@@ -15,11 +14,10 @@ class EstampilladoHelper
      * @param array $credentials
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login($credentials)
+    public static function login($credentials)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getServicioEstampilladoURL() . '/api/auth/login';
+            $url = URLHelper::getServicioEstampilladoURL() . '/api/auth/login';
 
             $client = new GuzzleClient();
             $response = $client->post($url, [
@@ -47,11 +45,10 @@ class EstampilladoHelper
      * @param string $numeroExpediente
      * @return \Illuminate\Http\JsonResponse
      */
-    public function solicitarEstampillado($jwt, $estatuto, $nombreArchivoEstatuto, $numeroExpediente)
+    public static function solicitarEstampillado($jwt, $estatuto, $nombreArchivoEstatuto, $numeroExpediente)
     {
         try {
-            $urlHelper = new URLHelper();
-            $url = $urlHelper->getServicioEstampilladoURL() . '/api/estampillar';
+            $url = URLHelper::getServicioEstampilladoURL() . '/api/estampillar';
 
             /* Envío del estatuto, número de expediente y credenciales del escribano que envía a estampillar.
             La respuesta del servicio será un número de hash asociado.*/
@@ -59,7 +56,7 @@ class EstampilladoHelper
                 "archivo_estatuto", $estatuto, $nombreArchivoEstatuto
             )->post($url, [
                 "numero_expediente" => $numeroExpediente,
-                "frontend_endpoint" => $urlHelper->getFrontendURL(),
+                "frontend_endpoint" => URLHelper::getFrontendURL(),
             ]);
 
             return $response->json();

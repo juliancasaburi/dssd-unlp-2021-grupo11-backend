@@ -3,8 +3,6 @@
 namespace App\Helpers;
 
 use GuzzleHttp\Client as GuzzleClient;
-use App\Helpers\URLHelper;
-use App\Helpers\BonitaRequestHelper;
 
 
 class BonitaMembershipHelper
@@ -17,13 +15,11 @@ class BonitaMembershipHelper
      * @param  string  $groupName
      * @return string
      */
-    public function groupIdByName($jsessionid, $xBonitaAPIToken, $groupName)
+    public static function groupIdByName($jsessionid, $xBonitaAPIToken, $groupName)
     {
-        $urlHelper = new URLHelper();
-        $url = $urlHelper->getBonitaEndpointURL('/API/identity/group?p=0&f=name%3d' . $groupName);
+        $url = URLHelper::getBonitaEndpointURL('/API/identity/group?p=0&f=name%3d' . $groupName);
 
-        $bonitaRequestHelper = new BonitaRequestHelper();
-        $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
         $client = new GuzzleClient([
             'headers' => $bonitaAuthHeaders
@@ -43,13 +39,11 @@ class BonitaMembershipHelper
      * @param  string  $roleName
      * @return string
      */
-    public function roleIdByName($jsessionid, $xBonitaAPIToken, $roleName)
+    public static function roleIdByName($jsessionid, $xBonitaAPIToken, $roleName)
     {
-        $urlHelper = new URLHelper();
-        $url = $urlHelper->getBonitaEndpointURL('/API/identity/role?p=0&f=name%3d' . $roleName);
+        $url = URLHelper::getBonitaEndpointURL('/API/identity/role?p=0&f=name%3d' . $roleName);
 
-        $bonitaRequestHelper = new BonitaRequestHelper();
-        $bonitaAuthHeaders = $bonitaRequestHelper->getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
 
         $client = new GuzzleClient([
             'headers' => $bonitaAuthHeaders
