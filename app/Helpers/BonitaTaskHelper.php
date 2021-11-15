@@ -147,7 +147,7 @@ class BonitaTaskHelper
         try {
             $url = URLHelper::getBonitaEndpointURL('/API/bpm/humanTask/' . $taskId);
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [$dataArray]);
 
@@ -174,7 +174,7 @@ class BonitaTaskHelper
             if ($assign == true)
                 $url = $url . '?assign=true';
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->withBody(null, 'application/json')->post($url);
 
