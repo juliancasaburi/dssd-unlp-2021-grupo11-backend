@@ -45,7 +45,7 @@ class BonitaProcessHelper
         try {
             $url = URLHelper::getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
 
             $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [
                 "type" => $type,
@@ -77,7 +77,7 @@ class BonitaProcessHelper
             $processId = head($response->json())['id'];
             $url = URLHelper::getBonitaEndpointURL('/API/bpm/case');
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken);
+            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
             $headers = array_merge($bonitaAuthHeaders, [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'

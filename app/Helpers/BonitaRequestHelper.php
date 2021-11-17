@@ -9,13 +9,18 @@ class BonitaRequestHelper
      *
      * @param  string $jsessionid
      * @param  string $xBonitaAPIToken
+     * @param  bool $additionalHeaders
      * @return array
      */
-    public static function getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken)
+    public static function getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, $additionalHeaders = false)
     {
-        return [
-            'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
-            'X-Bonita-API-Token' => $xBonitaAPIToken,
-        ];
+        $headers = ['Cookie' => 'JSESSIONID=' . $jsessionid];
+
+        if ($additionalHeaders) {
+            $headers['Cookie'] = $headers['Cookie'] . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken;
+            $headers['X-Bonita-API-Token'] = $xBonitaAPIToken;
+        }
+
+        return $headers;
     }
 }
