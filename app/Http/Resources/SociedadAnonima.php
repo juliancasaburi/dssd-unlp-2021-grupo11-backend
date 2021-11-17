@@ -34,7 +34,7 @@ class SociedadAnonima extends JsonResource
                 $service = new SociedadAnonimaService();
                 return $service->getPrivateFolderUrl($this->nombre);
             }),
-            'url_carpeta_apoderado' => $this->when($this->estado_evaluacion == 'Aprobado por escribano-area-legales', function () {
+            'url_carpeta_apoderado' => $this->when($this->estado_evaluacion, 'Sociedad registrada', function () {
                 $service = new SociedadAnonimaService();
                 return $service->getPublicFolderUrl($this->nombre);
             }),
