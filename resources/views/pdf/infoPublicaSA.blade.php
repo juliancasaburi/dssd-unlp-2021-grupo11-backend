@@ -8,7 +8,7 @@
 <body>
     <h1>Información pública de la S.A.</h1>
     <hr>
-    <div>
+    <div style="margin-top: 50px">
         <img src="data:image/png;base64, {{ $qr }}"/>
     <div>
     <h1>Nombre: {{ $nombre }}</h1>
