@@ -582,7 +582,7 @@ class SociedadAnonimaController extends Controller
     {
         try {
             $sociedadAnonimaValidator = Validator::make($request->all(), [
-                'nombre' => 'required|string|between:2,100|unique:sociedades_anonimas',
+                'nombre' => 'required|string|between:2,100|unique:sociedades_anonimas,nombre,NULL,id,deleted_at,NULL',
                 'fecha_creacion' => 'required|date|before_or_equal:now',
                 'domicilio_legal' => 'required|string|between:2,100',
                 'domicilio_real' => 'required|string|between:2,100',
@@ -708,6 +708,8 @@ class SociedadAnonimaController extends Controller
 
         try {
             $sa = SociedadAnonima::where('nombre', $nombreSociedad)->first();
+
+            $sa->estado_evaluacion = 'Plazo expirado';
 
             DB::table('sociedades_anonimas_estados')
              ->where('sociedad_anonima_id', $sa->id)
