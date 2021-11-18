@@ -233,7 +233,7 @@ class SociedadAnonimaService
 
     public function getUserSociedadesAnonimasWithSociosAndEstados(User $user)
     {
-        return SociedadAnonima::with(['socios', 'estados'])->where('created_by', $user->id)->get();
+        return SociedadAnonima::with(['socios', 'estados'])->where('created_by', $user->id)->withTrashed()->get();
     }
 
     public function getSociedadAnonimaWithSociosAndEstadosById(int $id)

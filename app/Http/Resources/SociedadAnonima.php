@@ -30,6 +30,7 @@ class SociedadAnonima extends JsonResource
             'numero_hash' => $this->numero_hash,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'deleted_at' => $this->deleted_at,
             'url_carpeta_estatuto' => $this->when(Auth::user()->getRoleNames()->first() == 'escribano-area-legales', function () {
                 $service = new SociedadAnonimaService();
                 return $service->getPrivateFolderUrl($this->nombre);
