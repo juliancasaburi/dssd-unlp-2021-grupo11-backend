@@ -9,7 +9,9 @@ _Sigue las siguientes instrucciones para clonar este repositorio en tu máquina 
 - docker-compose
 https://docs.docker.com/compose/install/
 
-- Haber clonado e instalado el docker-compose provisto por el grupo, siguiendo la guía de instalación provista https://github.com/juliancasaburi/dssd-unlp-2021-grupo11-laradock
+- Haber clonado e instalado el docker-compose provisto por el grupo, siguiendo la guía de instalación https://github.com/juliancasaburi/dssd-unlp-2021-grupo11-laradock
+
+- Haber clonado el proyecto BPM en Bonita Open Solution, siguiendo la guía de instalación https://github.com/juliancasaburi/dssd-unlp-2021-grupo11-bpm
 
 ### Instalación 🔧
 
