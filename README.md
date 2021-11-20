@@ -34,6 +34,12 @@ sudo chmod -R 777 storage bootstrap/cache
 
 _4. Configure las variables de entorno_
 
+Cree el archivo ` .env` a partir de ` .env.example`
+
+```
+cp .env.example .env
+```
+
 Configure las variables relacionadas a Bonita, Google Drive y CORS en el archivo ` .env`  
 
 Ejemplo sin credenciales:
@@ -52,6 +58,8 @@ MAIN_GOOGLE_DRIVE_PRIVATE_FOLDER=Privado
 MAIN_GOOGLE_DRIVE_PUBLIC_FOLDER=Publico
 
 FRONTEND_ENDPOINT=http://localhost:3002
+
+ESTAMPILLADO_ENDPOINT=http://localhost:82
 ```
 
 ### En el primer inicio del servicio, deberá instalar las dependencias y realizar algunas actividades de configuración
