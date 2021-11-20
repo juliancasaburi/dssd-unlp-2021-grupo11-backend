@@ -15,9 +15,23 @@ use App\Http\Resources\SociedadAnonimaCollection;
 use Exception;
 use App\Jobs\ProcessAprobacionSA;
 use Illuminate\Support\Facades\DB;
-
 class SociedadAnonimaController extends Controller
 {
+    /**
+    * 
+    * @param Illuminate\Support\Facades\Validator $validator
+    * @param Array $sociosArray
+    */
+    private function validarSocios($sociosValidator, $sociosArray){
+        $sociosValidator->after(function ($validator) use ($sociosArray) {
+            if (collect($sociosArray)->sum('porcentaje') != 100) {
+                $validator->errors()->add(
+                    'socios.porcentaje', 'La suma del porcentaje de socios debe ser 100.'
+                );
+            }
+        });
+    }
+
     /**
      * Obtener el pdf con la información publica de la SociedadAnonima.
      *
@@ -396,8 +410,8 @@ class SociedadAnonimaController extends Controller
                 '*.apellido' => 'required|string|between:2,100',
                 '*.porcentaje' => 'required|numeric|between:0.01,100',
                 '*.apoderado' => ['required', Rule::in(['true', 'false'])]
-                //TODO: validar que el total de aportes entre todos los socios = 100
             ]);
+            $this->validarSocios($sociosValidator, $sociosArray);
 
             $paisesEstadosArray = json_decode($request->input('paises_estados'), true);
             $paisesValidator = Validator::make($paisesEstadosArray, [
@@ -603,8 +617,8 @@ class SociedadAnonimaController extends Controller
                 '*.apellido' => 'required|string|between:2,100',
                 '*.porcentaje' => 'required|numeric|between:0.01,100',
                 '*.apoderado' => ['required', Rule::in(['true', 'false'])]
-                //TODO: validar que el total de aportes entre todos los socios = 100
             ]);
+            $this->validarSocios($sociosValidator, $sociosArray);
 
             $paisesEstadosArray = json_decode($request->input('paises_estados'), true);
             $paisesValidator = Validator::make($paisesEstadosArray, [
