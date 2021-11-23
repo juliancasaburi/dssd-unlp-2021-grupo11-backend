@@ -12,6 +12,7 @@ use App\Helpers\URLHelper;
 use App\Helpers\BonitaUserHelper;
 use App\Helpers\BonitaAdminLoginHelper;
 use App\Helpers\BonitaMembershipHelper;
+use App\Helpers\BonitaRequestHelper;
 use App\Http\Resources\User as UserResource;
 
 class AuthController extends Controller
@@ -76,7 +77,7 @@ class AuthController extends Controller
         }
 
         try {
-            
+
             $apiUrl = URLHelper::getBonitaEndpointURL('/loginservice');
 
             $response = Http::asForm()->post($apiUrl, [
@@ -115,15 +116,19 @@ class AuthController extends Controller
      *    ),
      * )
      * 
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout()
+    public function logout(Request $request)
     {
         try {
-            
-            $apiUrl = URLHelper::getBonitaEndpointURL('/logoutservice');
+            $jsessionid = $request->cookie('JSESSIONID');
+            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $response = Http::post($apiUrl);
+            $apiUrl = URLHelper::getBonitaEndpointURL('/logoutservice');
+            $response = Http::withHeaders(
+                BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken)
+                )->post($apiUrl);
 
             if ($response->status() == 401)
                 return response()->json("401 Unauthorized", 401);
