@@ -153,16 +153,19 @@ class AuthController extends Controller
      */
     protected function respondWithTokenCookiesAndUser($token, $cookieArray, $user)
     {
-        $cookie = cookie($cookieArray[1]['Name'], $cookieArray[1]['Value'], 1440);
-        $cookie2 = cookie($cookieArray[2]['Name'], $cookieArray[2]['Value'], 1440);
-
-        return response()->json(["auth" => [
+        $response = response()->json(["auth" => [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'JSESSIONID' => $cookieArray[1]['Value'],
             'X-Bonita-API-Token' => $cookieArray[2]['Value']
-        ], "user" => $user])->cookie($cookie)->cookie($cookie2);
+        ], "user" => $user]);
+
+        foreach ($cookieArray as $cookie){
+            $response->cookie(cookie($cookie['Name'], $cookie['Value']));
+        }
+
+        return $response;
     }
 
     /** Register a User
