@@ -21,14 +21,14 @@ class ProcessAprobacionSA implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * The sociedadAnonima instance.
+     * The sociedadAnonima instance
      *
      * @var \App\Models\SociedadAnonima
      */
     protected $sociedadAnonima;
 
     /**
-     * The user instance.
+     * The user instance
      *
      * @var \App\Models\User
      */
@@ -52,6 +52,9 @@ class ProcessAprobacionSA implements ShouldQueue
      * Create a new job instance.
      *
      * @param  App\Models\SociedadAnonima  $sociedadAnonima
+     * @param  App\Models\User $user
+     * @param  string $bonitaCaseId
+     * @param  string $nuevoEstadoEvaluacion
      * @return void
      */
     public function __construct(SociedadAnonima $sociedadAnonima, User $user, $bonitaCaseId, $nuevoEstadoEvaluacion)
@@ -63,7 +66,7 @@ class ProcessAprobacionSA implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Execute the job
      *
      * @return void
      */
@@ -77,7 +80,6 @@ class ProcessAprobacionSA implements ShouldQueue
         $loginResponse = EstampilladoHelper::login($escribanoCredentials);
 
         $service = new SociedadAnonimaService();
-
         $estampilladoResponse = EstampilladoHelper::solicitarEstampillado(
             $loginResponse["auth"]["access_token"],
             $service->getEstatutoContents($this->sociedadAnonima->nombre),
