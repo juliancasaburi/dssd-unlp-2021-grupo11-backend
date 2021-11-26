@@ -322,11 +322,11 @@ class SociedadAnonimaController extends Controller
             $sociedadAnonima->estado_evaluacion = $nuevoEstadoEvaluacion;
             if ($rol == "empleado-mesa-de-entradas"){
                 $sociedadAnonima->cantidad_rechazos_mesa_entradas += 1;
-                BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "cantidad_rechazos_mesa_entradas", "java.lang.String", $sociedadAnonima->cantidad_rechazos_mesa_entradas);
+                BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "cantidad_rechazos_mesa_entradas", "java.lang.Integer", $sociedadAnonima->cantidad_rechazos_mesa_entradas);
             }
             else{
                 $sociedadAnonima->cantidad_rechazos_area_legales += 1;
-                BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "cantidad_rechazos_area_legales", "java.lang.String", $sociedadAnonima->cantidad_rechazos_area_legales);
+                BonitaProcessHelper::updateCaseVariable($jsessionid, $xBonitaAPIToken, $bonitaCaseId, "cantidad_rechazos_area_legales", "java.lang.Integer", $sociedadAnonima->cantidad_rechazos_area_legales);
             }
             $sociedadAnonima->save();
         }
