@@ -51,7 +51,6 @@ class TaskController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $bonitaTaskHelper = new BonitaTaskHelper();
             $response = BonitaTaskHelper::availableTasks($jsessionid, $xBonitaAPIToken, auth()->user()->getRoleNames());
 
             return response()->json($response, 200);
@@ -99,7 +98,6 @@ class TaskController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $bonitaTaskHelper = new BonitaTaskHelper();
             $response = BonitaTaskHelper::userTasks($jsessionid, $xBonitaAPIToken, auth()->user()->bonita_user_id);
 
             return response()->json($response, 200);
@@ -160,7 +158,6 @@ class TaskController extends Controller
     {
         $jsessionid = $request->cookie('JSESSIONID');
         $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
-        $bonitaTaskHelper = new BonitaTaskHelper();
         $taskData = BonitaTaskHelper::taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
         $user = auth()->user();
         if ($taskData["assigned_id"] != $user->bonita_user_id)
@@ -232,7 +229,6 @@ class TaskController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $bonitaTaskHelper = new BonitaTaskHelper();
             $response = BonitaTaskHelper::taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
             if ($response["assigned_id"] != 0)
@@ -301,13 +297,11 @@ class TaskController extends Controller
             $jsessionid = $request->cookie('JSESSIONID');
             $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $bonitaTaskHelper = new BonitaTaskHelper();
             $response = BonitaTaskHelper::taskDataById($jsessionid, $xBonitaAPIToken, $taskId);
 
             if ($response["assigned_id"] != auth()->user()->bonita_user_id)
                 return response()->json("No estás asginado a la tarea. No puedes liberarla.", 403);
 
-            $bonitaTaskHelper = new BonitaTaskHelper();
             $response = BonitaTaskHelper::unassignTask($jsessionid, $xBonitaAPIToken, $taskId);
 
             return response()->json("Tarea liberada", 200);
