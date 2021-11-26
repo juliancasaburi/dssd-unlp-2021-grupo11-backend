@@ -74,6 +74,14 @@ class SociedadAnonima extends Model
     }
 
     /**
+     * Obtener los países a los que exporta.
+     */
+    public function paises()
+    {
+        return $this->belongsToMany(Pais::class, 'sociedades_anonimas_paises')->withTimestamps();
+    }
+
+    /**
      * Obtener los estados a los que exporta.
      */
     public function estados()

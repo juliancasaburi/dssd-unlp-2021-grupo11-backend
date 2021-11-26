@@ -38,4 +38,12 @@ class Pais extends Model
     {
         return $this->hasMany(Estado::class);
     }
+
+    /**
+     * Obtener las sociedades anonimas que exportan a este país.
+     */
+    public function sociedadesAnonimas()
+    {
+        return $this->belongsToMany(SociedadAnonima::class, 'sociedades_anonimas_paises', 'pais_id', 'sociedad_anonima_id')->withTimestamps();
+    }
 }

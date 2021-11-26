@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Estado;
 use Illuminate\Support\Facades\Auth;
 use App\Services\SociedadAnonimaService;
 
@@ -39,8 +38,11 @@ class SociedadAnonima extends JsonResource
                 $service = new SociedadAnonimaService();
                 return $service->getPublicFolderUrl($this->nombre);
             }),
-            'socios' => $this->socios,
-            'estados' => Estado::collection($this->estados->sortBy('pais')),
+            'socios' => Socio::Collection($this->socios),
+            'geo' => [
+                "paises" => Pais::Collection($this->paises),
+                "estados" => Estado::Collection($this->estados->sortBy('pais')),
+            ],
         ];
     }
 }

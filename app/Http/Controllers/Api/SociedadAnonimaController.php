@@ -445,7 +445,8 @@ class SociedadAnonimaController extends Controller
                 $sociosArray,
             );
 
-            /* Actualizar estados */
+            /* Actualizar paises y estados */
+            $sociedadAnonima->paises()->detach();
             $sociedadAnonima->estados()->detach();
             $service->storeEstados(
                 $sociedadAnonima,

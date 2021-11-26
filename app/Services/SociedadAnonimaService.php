@@ -174,6 +174,7 @@ class SociedadAnonimaService
                 'code' => $datosPaisEstados["code"],
                 'name' => $datosPaisEstados["name"]
             ]);
+            $sociedadAnonima->paises()->save($pais);
             $pais->continente()->associate($continente);
             $pais->save();
             foreach ($datosPaisEstados["estados"] as $datosEstado){
