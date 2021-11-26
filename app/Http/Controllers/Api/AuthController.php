@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
 use App\Helpers\URLHelper;
@@ -76,24 +75,17 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        try {
+        $apiUrl = URLHelper::getBonitaEndpointURL('/loginservice');
 
-            $apiUrl = URLHelper::getBonitaEndpointURL('/loginservice');
+        $response = Http::asForm()->post($apiUrl, [
+            'username' => $credentials["email"],
+            'password' => $credentials['password'],
+            'redirect' => 'false',
+        ])->throw();
 
-            $response = Http::asForm()->post($apiUrl, [
-                'username' => $credentials["email"],
-                'password' => $credentials['password'],
-                'redirect' => 'false',
-            ]);
-            if ($response->status() == 401)
-                return response()->json("401 Unauthorized", 401);
+        $user = new UserResource(auth('api')->user());
 
-            $user = new UserResource(auth('api')->user());
-
-            return $this->respondWithTokenCookiesAndUser($token, $response->cookies()->toArray(), $user);
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        return $this->respondWithTokenCookiesAndUser($token, $response->cookies()->toArray(), $user);
     }
 
     /**
@@ -121,24 +113,20 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        try {
-            $jsessionid = $request->cookie('JSESSIONID');
-            $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
+        $jsessionid = $request->cookie('JSESSIONID');
+        $xBonitaAPIToken = $request->cookie('X-Bonita-API-Token');
 
-            $apiUrl = URLHelper::getBonitaEndpointURL('/logoutservice');
-            $response = Http::withHeaders(
-                BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken)
-                )->post($apiUrl);
+        $apiUrl = URLHelper::getBonitaEndpointURL('/logoutservice');
+        $response = Http::withHeaders(
+            BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken)
+        )->post($apiUrl)->throw();
 
-            if ($response->status() == 401)
-                return response()->json("401 Unauthorized", 401);
+        if ($response->status() == 401)
+            return response()->json("401 Unauthorized", 401);
 
-            auth('api')->logout();
+        auth('api')->logout();
 
-            return response()->json(['message' => 'Successfully logged out'], 200);
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        return response()->json(['message' => 'Successfully logged out'], 200);
     }
 
 
@@ -153,19 +141,16 @@ class AuthController extends Controller
      */
     protected function respondWithTokenCookiesAndUser($token, $cookieArray, $user)
     {
-        $response = response()->json(["auth" => [
+        $cookie = cookie($cookieArray[1]['Name'], $cookieArray[1]['Value'], 1440);
+        $cookie2 = cookie($cookieArray[2]['Name'], $cookieArray[2]['Value'], 1440);
+
+        return response()->json(["auth" => [
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'JSESSIONID' => $cookieArray[1]['Value'],
             'X-Bonita-API-Token' => $cookieArray[2]['Value']
-        ], "user" => $user]);
-
-        foreach ($cookieArray as $cookie){
-            $response->cookie(cookie($cookie['Name'], $cookie['Value']));
-        }
-
-        return $response;
+        ], "user" => $user])->cookie($cookie)->cookie($cookie2);
     }
 
     /** Register a User
@@ -241,8 +226,6 @@ class AuthController extends Controller
         try {
             $bonitaAdminLoginHelper = new BonitaAdminLoginHelper();
             $bonitaAdminLoginResponse = $bonitaAdminLoginHelper->login();
-            if ($bonitaAdminLoginResponse->status() == 401)
-                return response()->json("500 Internal Server Error", 500);
 
             $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
             $xBonitaAPIToken = $bonitaAdminLoginResponse->cookies()->toArray()[2]['Value'];

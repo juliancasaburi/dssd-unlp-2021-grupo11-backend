@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 class BonitaUserHelper
@@ -17,32 +16,28 @@ class BonitaUserHelper
      */
     public static function registerUser($jsessionid, $xBonitaAPIToken, $userData)
     {
-        try {
-            $bonitaRegisterUserUrl = URLHelper::getBonitaEndpointURL("/API/identity/user");
+        $bonitaRegisterUserUrl = URLHelper::getBonitaEndpointURL("/API/identity/user");
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
-            $headers = array_merge($bonitaAuthHeaders, [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ]);
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
+        $headers = array_merge($bonitaAuthHeaders, [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ]);
 
-            /* Register Bonita User */
-            $bonitaRegisterResponse = Http::withHeaders($headers)->post($bonitaRegisterUserUrl, [
-                "userName" => $userData["email"],
-                "email" => $userData["email"],
-                "password" => $userData["password"],
-                "password_confirm" => $userData["password"],
-                "icon" => "",
-                "firstname" => $userData["name"],
-                "lastname" => $userData["name"],
-                "title" => "Mr",
-                "job_title" => "Apoderado",
-            ]);
+        /* Register Bonita User */
+        $bonitaRegisterResponse = Http::withHeaders($headers)->post($bonitaRegisterUserUrl, [
+            "userName" => $userData["email"],
+            "email" => $userData["email"],
+            "password" => $userData["password"],
+            "password_confirm" => $userData["password"],
+            "icon" => "",
+            "firstname" => $userData["name"],
+            "lastname" => $userData["name"],
+            "title" => "Mr",
+            "job_title" => "Apoderado",
+        ])->throw();
 
-            return $bonitaRegisterResponse;
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        return $bonitaRegisterResponse;
     }
 
     /**
@@ -55,26 +50,22 @@ class BonitaUserHelper
      */
     public static function setUserMembership($jsessionid, $xBonitaAPIToken, $data)
     {
-        try {
-            $bonitaSetUserMembershipUrl = URLHelper::getBonitaEndpointURL("/API/identity/membership");
+        $bonitaSetUserMembershipUrl = URLHelper::getBonitaEndpointURL("/API/identity/membership");
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
-            $headers = array_merge($bonitaAuthHeaders, [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ]);
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
+        $headers = array_merge($bonitaAuthHeaders, [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ]);
 
-            /* Register Bonita User */
-            $bonitaSetUserMembershipResponse = Http::withHeaders($headers)->post($bonitaSetUserMembershipUrl, [
-                "user_id" => $data["user_id"],
-                "group_id" => $data["group_id"],
-                "role_id" => $data["role_id"],
-            ]);
+        /* Register Bonita User */
+        $bonitaSetUserMembershipResponse = Http::withHeaders($headers)->post($bonitaSetUserMembershipUrl, [
+            "user_id" => $data["user_id"],
+            "group_id" => $data["group_id"],
+            "role_id" => $data["role_id"],
+        ])->throw();
 
-            return $bonitaSetUserMembershipResponse;
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        return $bonitaSetUserMembershipResponse;
     }
 
 
@@ -88,22 +79,18 @@ class BonitaUserHelper
      */
     public static function enableUser($jsessionid, $xBonitaAPIToken, $bonitaUserId)
     {
-        try {
-            $bonitaEnableUserUrl = URLHelper::getBonitaEndpointURL("/API/identity/user/{$bonitaUserId}");
+        $bonitaEnableUserUrl = URLHelper::getBonitaEndpointURL("/API/identity/user/{$bonitaUserId}");
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
-            $headers = array_merge($bonitaAuthHeaders, [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ]);
-            
-            $bonitaEnableUserResponse = Http::withHeaders($headers)->put($bonitaEnableUserUrl, [
-                "enabled" => "true",
-            ]);
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
+        $headers = array_merge($bonitaAuthHeaders, [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ]);
 
-            return $bonitaEnableUserResponse;
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        $bonitaEnableUserResponse = Http::withHeaders($headers)->put($bonitaEnableUserUrl, [
+            "enabled" => "true",
+        ])->throw();
+
+        return $bonitaEnableUserResponse;
     }
 }
