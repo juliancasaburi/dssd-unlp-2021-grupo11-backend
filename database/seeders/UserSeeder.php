@@ -29,21 +29,21 @@ class UserSeeder extends Seeder
         $apiIdentityUsersUrl = URLHelper::getBonitaEndpointURL('/API/identity/user?p=0&f=enabled=true');
 
         $users = Http::withHeaders($bonitaAuthHeaders)->get($apiIdentityUsersUrl);
-        
+
         foreach (json_decode($users, true) as $user) {
             $userData = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
                 'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get(URLHelper::getBonitaEndpointURL("/API/identity/user?s={$user['userName']}"));
+            ])->get(URLHelper::getBonitaEndpointURL("/API/identity/user?s={$user['userName']}"))->throw();
 
             $userId = head($userData->json())['id'];
 
             $membershipData = Http::withHeaders([
                 'Cookie' => 'JSESSIONID=' . $jsessionid . ';' . 'X-Bonita-API-Token=' . $xBonitaAPIToken,
                 'X-Bonita-API-Token' => $xBonitaAPIToken,
-            ])->get(URLHelper::getBonitaEndpointURL("/API/identity/membership?p=0&c=10&f=user_id={$userId}&d=role_id"));
+            ])->get(URLHelper::getBonitaEndpointURL("/API/identity/membership?p=0&c=10&f=user_id={$userId}&d=role_id"))->throw();
 
-            if (!empty($membershipData->json())){
+            if (!empty($membershipData->json())) {
                 User::create([
                     'name'      =>  $user["firstname"],
                     'email'     =>  $user["userName"],
