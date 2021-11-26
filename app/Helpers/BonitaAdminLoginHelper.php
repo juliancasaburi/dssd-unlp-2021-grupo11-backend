@@ -18,6 +18,6 @@ class BonitaAdminLoginHelper
             'username' => config('services.bonita.admin_user'),
             'password' => config('services.bonita.admin_password'),
             'redirect' => 'false',
-        ]);
+        ])->throw();
     }
 }

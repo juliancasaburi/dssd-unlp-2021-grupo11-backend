@@ -115,8 +115,6 @@ class ProcessAprobacionSA implements ShouldQueue
 
         $bonitaAdminLoginHelper = new BonitaAdminLoginHelper();
         $bonitaAdminLoginResponse = $bonitaAdminLoginHelper->login();
-        if ($bonitaAdminLoginResponse->status() != 204)
-            throw new Exception();
 
         $jsessionid = $bonitaAdminLoginResponse->cookies()->toArray()[1]['Value'];
         $xBonitaAPIToken = $bonitaAdminLoginResponse->cookies()->toArray()[2]['Value'];

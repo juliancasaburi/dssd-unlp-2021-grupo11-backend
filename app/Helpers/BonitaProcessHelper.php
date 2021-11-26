@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 class BonitaProcessHelper
@@ -16,17 +15,13 @@ class BonitaProcessHelper
      */
     public static function processByName($jsessionid, $name)
     {
-        try {
-            $url = URLHelper::getBonitaEndpointURL('/API/bpm/process?s=' . $name);
+        $url = URLHelper::getBonitaEndpointURL('/API/bpm/process?s=' . $name);
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid,
-            ])->get($url);
+        $response = Http::withHeaders([
+            'Cookie' => 'JSESSIONID=' . $jsessionid,
+        ])->get($url)->throw();
 
-            return $response->json();
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        return $response->json();
     }
 
     /**
@@ -42,20 +37,16 @@ class BonitaProcessHelper
      */
     public static function updateCaseVariable($jsessionid, $xBonitaAPIToken, $caseId, $variableName, $type, $value)
     {
-        try {
-            $url = URLHelper::getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
+        $url = URLHelper::getBonitaEndpointURL('/API/bpm/caseVariable/' . $caseId . '/' . $variableName);
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
 
-            $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [
-                "type" => $type,
-                "value" => $value,
-            ]);
+        $response = Http::withHeaders($bonitaAuthHeaders)->put($url, [
+            "type" => $type,
+            "value" => $value,
+        ])->throw();
 
-            return $response->json();
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        return $response->json();
     }
 
     /**
@@ -67,44 +58,40 @@ class BonitaProcessHelper
      */
     public static function startProcessByName($jsessionid, $xBonitaAPIToken, $name, $caseData)
     {
-        try {
-            $url = URLHelper::getBonitaEndpointURL('/API/bpm/process?s=' . $name);
+        $url = URLHelper::getBonitaEndpointURL('/API/bpm/process?s=' . $name);
 
-            $response = Http::withHeaders([
-                'Cookie' => 'JSESSIONID=' . $jsessionid,
-            ])->get($url);
+        $response = Http::withHeaders([
+            'Cookie' => 'JSESSIONID=' . $jsessionid,
+        ])->get($url)->throw();
 
-            $processId = head($response->json())['id'];
-            $url = URLHelper::getBonitaEndpointURL('/API/bpm/case');
+        $processId = head($response->json())['id'];
+        $url = URLHelper::getBonitaEndpointURL('/API/bpm/case');
 
-            $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
-            $headers = array_merge($bonitaAuthHeaders, [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ]);
+        $bonitaAuthHeaders = BonitaRequestHelper::getBonitaAuthHeaders($jsessionid, $xBonitaAPIToken, true);
+        $headers = array_merge($bonitaAuthHeaders, [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ]);
 
-            /* Register Bonita User */
-            $bonitaRegisterResponse = Http::withHeaders($headers)->post($url, [
-                "processDefinitionId" => $processId,
-                "variables" => [
-                    [
-                        "name" => "nombre_sociedad",
-                        "value" => $caseData['nombre_sociedad']
-                    ],
-                    [
-                        "name" => "email_apoderado",
-                        "value" => $caseData['email_apoderado']
-                    ],
-                    [
-                        "name" => "estado_evaluacion",
-                        "value" => "Pendiente mesa de entradas"
-                    ],
-                    ],
-            ]);
+        /* Register Bonita User */
+        $bonitaRegisterResponse = Http::withHeaders($headers)->post($url, [
+            "processDefinitionId" => $processId,
+            "variables" => [
+                [
+                    "name" => "nombre_sociedad",
+                    "value" => $caseData['nombre_sociedad']
+                ],
+                [
+                    "name" => "email_apoderado",
+                    "value" => $caseData['email_apoderado']
+                ],
+                [
+                    "name" => "estado_evaluacion",
+                    "value" => "Pendiente mesa de entradas"
+                ],
+            ],
+        ])->throw();
 
-            return response(json_decode($bonitaRegisterResponse->body(), true), $bonitaRegisterResponse->status());
-        } catch (ConnectionException $e) {
-            return response()->json("500 Internal Server Error", 500);
-        }
+        return response(json_decode($bonitaRegisterResponse->body(), true), $bonitaRegisterResponse->status());
     }
 }
