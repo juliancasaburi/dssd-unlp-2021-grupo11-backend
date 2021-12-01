@@ -64,6 +64,8 @@ FRONTEND_ENDPOINT=http://localhost:3002
 ESTAMPILLADO_ENDPOINT=http://localhost:82
 ```
 
+> **NOTA:** Para obtener los datos de acceso a la API de Google Drive, se recomienda leer la siguiente guía https://robindirksen.com/blog/google-drive-storage-as-filesystem-in-laravel#setup-google-api-authentication
+
 ### En el primer inicio del servicio, deberá instalar las dependencias y realizar algunas actividades de configuración
 
 Luego de iniciar el docker-compose provisto, deberá ejecutar los siguientes comandos
